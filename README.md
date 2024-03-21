@@ -16,7 +16,7 @@ Once a student finds a tutor, the application provides the tutor’s email addre
 ## Contributors
 - Cameron Thomas
 - Jerry Wang
-- Lathan Lamp
+- Nathan Lamp
 - Cameron Kounthapanya
 - Carter Bassett
 
