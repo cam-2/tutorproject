@@ -9,6 +9,7 @@ Tutors register information such as:
 - General location
 - Available times
 - Cost per session  
+
 Student users can query for tutors based on these criteria.   
 Once a student finds a tutor, the application provides the tutor’s email address for coordination. Based on their communication, a time and date is selected, and the application updates to show that time as unavailable for other students.  
 
