@@ -1,0 +1,31 @@
+{{> message}}
+<center>
+    <div>
+        <font size="5">
+            <b>
+                Register
+            </b>
+        </font>    
+    </div>
+    <form action="/register" method="POST">
+        <div>
+            <label for='username'>
+                <b>Username:</b>
+            </label>
+        </div>
+        <div>
+            <input name='username'/>
+        </div>
+        <div>
+            <label for='password'>
+                <b>Password:</b>
+            </label>
+        </div>
+        <div>
+            <input name="password"></input>
+        </div>
+        <div>
+            <Button type='submit' class='btn btn-primary'>Submit</Button>
+        </div>
+    </form>
+</center>
