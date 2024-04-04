@@ -13,8 +13,8 @@ const json = require('body-parser/lib/types/json');
 
 const hbs = handlebars.create({
   extname: 'hbs',
-  layoutsDir: __dirname + '/Scenes/layouts', //not used rn
-  partialsDir: __dirname + '/Scenes/partials', //not used rn
+  layoutsDir: __dirname + '/views/layouts', //not used rn
+  partialsDir: __dirname + '/views/partials', //not used rn
 });
 
 // database configuration
@@ -55,15 +55,33 @@ session({
 );
 
 app.get('/', (req, res) => {
-    res.redirect('/loginStudent'); //this will call the /login route in the API
+    console.log("Calling here!");
+    res.redirect('/register'); //this will call the /login route in the API
 });
 
 app.get('/loginStudent', (req, res) => {
-    res.render('Scenes/loginStudent');
+    res.render('./pages/loginStudent.hbs');
 });
 
-app.get('/registerStudent', (req, res) => {
-    res.render('Scenes/registerStudent');
+app.get('/register', (req, res) => {
+    res.render('./pages/register.hbs');
+});
+
+app.post('/register', async (req, res) => {
+  const hash = await bcrypt.hash(req.boody.password, 10);
+
+  const insertQuery = 'INSERT INTO student (username, password) VALUES ($1, $2)';
+  const insertValues = [req.body.username, hash];
+  // Execute the query
+  let response = await db.any(insertQuery, insertValues);
+  if(response.err) {
+    console.log('Error: Could not insert into db.');
+    res.redirect('/register');
+  }
+  else {
+    console.log('Success: User added to db.');
+    res.redirect('/login');
+  }
 });
 
 app.listen(3000);
