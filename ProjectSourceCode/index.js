@@ -62,8 +62,8 @@ app.get('/loginStudent', (req, res) => {
     res.render('Scenes/loginStudent');
 });
 
-app.get('/register', (req, res) => {
-    res.render('Scenes/register');
+app.get('/registerStudent', (req, res) => {
+    res.render('Scenes/registerStudent');
 });
 
 app.listen(3000);
