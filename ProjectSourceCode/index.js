@@ -1,7 +1,7 @@
 const express = require('express'); // To build an application server or API
 const app = express();
-//const handlebars = require('express-handlebars'); //giving error worry later
-//const Handlebars = require('handlebars');
+const handlebars = require('express-handlebars'); //giving error worry later
+const Handlebars = require('handlebars');
 const path = require('path');
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
@@ -10,6 +10,12 @@ const bcrypt = require('bcrypt'); //  To hash passwords
 const { name } = require('body-parser');
 const json = require('body-parser/lib/types/json');
 
+
+const hbs = handlebars.create({
+  extname: 'hbs',
+  layoutsDir: __dirname + '/Scenes/layouts', //not used rn
+  partialsDir: __dirname + '/Scenes/partials', //not used rn
+});
 
 // database configuration
 const dbConfig = {
@@ -30,6 +36,15 @@ db.connect()
   .catch(error => {
     console.log('ERROR:', error.message || error);
   });
+
+
+
+// Register `hbs` as our view engine using its bound `engine()` function.
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('Scenes', path.join(__dirname, 'Scenes'));
+app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+
 
 app.use(
 session({
