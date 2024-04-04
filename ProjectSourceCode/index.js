@@ -1,5 +1,7 @@
 const express = require('express'); // To build an application server or API
 const app = express();
+//const handlebars = require('express-handlebars'); //giving error worry later
+//const Handlebars = require('handlebars');
 const path = require('path');
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
@@ -18,6 +20,7 @@ const dbConfig = {
     password: process.env.POSTGRES_PASSWORD, // the password of the user account
 };
 
+const db = pgp(dbConfig);
 // test your database
 db.connect()
   .then(obj => {
@@ -37,15 +40,15 @@ session({
 );
 
 app.get('/', (req, res) => {
-    res.redirect('/login'); //this will call the /login route in the API
+    res.redirect('/loginStudent'); //this will call the /login route in the API
 });
 
-app.get('/login', (req, res) => {
-    res.render('pages/login');
+app.get('/loginStudent', (req, res) => {
+    res.render('Scenes/loginStudent');
 });
 
 app.get('/register', (req, res) => {
-    res.render('pages/register');
+    res.render('Scenes/register');
 });
 
 app.listen(3000);
