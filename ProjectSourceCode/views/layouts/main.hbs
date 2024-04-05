@@ -1,7 +1,14 @@
-<!-- TODO: Add the head.hbs partial here -->
-{{> head}}
-<!-- TODO: Add the nav.hbs partial here -->
-{{> nav}}
-{{{body}}}
-<!-- TODO: Add the footer.hbs partial here -->
-{{> footer}}
+<!DOCTYPE html>  
+<html lang="en">  
+  <head>  
+    <meta charset="utf-8" />      
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />  
+    <link rel="stylesheet" href="/ProjectSourceCode/css/stylesheet.css" />
+    {{>head}}
+    {{>nav}}
+  </head>
+  <body>
+    {{{body}}}
+    {{> footer}}
+  </body>
+</html>

@@ -70,6 +70,9 @@ app.get('/loginTutor', (req, res) => {
   res.render('./pages/loginTutor.hbs');
 });
 
+app.get('/landing', (req, res) => {
+  res.render('./pages/landingPage.hbs');
+});
 
 app.get('/register', (req, res) => {
   res.render('./pages/register.hbs');
