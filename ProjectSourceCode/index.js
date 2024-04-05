@@ -66,10 +66,84 @@ app.get('/', (req, res) => {
 app.get('/loginStudent', (req, res) => {
   res.render('./pages/loginStudent.hbs');
 });
+app.get('/loginTutor', (req, res) => {
+  res.render('./pages/loginTutor.hbs');
+});
+
 
 app.get('/register', (req, res) => {
   res.render('./pages/register.hbs');
 });
+
+app.post('/loginStudent', async (req, res) => {
+
+  // Find the user based on the entered username
+  try {
+    const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]);
+    try {
+        
+        const password = req.body.password;;
+        const match = await bcrypt.compare(password, user.password);
+    
+        if (match) {
+          // Save user details in the session
+          req.session.user = user;
+          req.session.save();
+          res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
+        } else {
+          // Incorrect password
+          res.render('pages/loginStudent', {
+            error: true,
+            message: "Incorrect password.",
+          });
+        }
+      } catch (error) { //should not happen
+        console.error('Error during password comparison:', error);
+        res.status(500).send('Internal Server Error');
+      }
+  } catch (error) {
+    res.render('pages/register', {
+        error: true,
+        message: "Username not found! Register here.",
+      });
+  }
+});
+
+app.post('/loginTutor', async (req, res) => {
+
+  // Find the user based on the entered username
+  try {
+    const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]);
+    try {
+        
+        const password = req.body.password;;
+        const match = await bcrypt.compare(password, user.password);
+    
+        if (match) {
+          // Save user details in the session
+          req.session.user = user;
+          req.session.save();
+          res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
+        } else {
+          // Incorrect password
+          res.render('pages/loginStudent', {
+            error: true,
+            message: "Incorrect password.",
+          });
+        }
+      } catch (error) { //should not happen
+        console.error('Error during password comparison:', error);
+        res.status(500).send('Internal Server Error');
+      }
+  } catch (error) {
+    res.render('pages/register', {
+        error: true,
+        message: "Username not found! Register here.",
+      });
+  }
+});
+
+
 
 app.post('/register', async (req, res) => {
   const hash = await bcrypt.hash(req.body.password, 10);
