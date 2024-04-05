@@ -60,7 +60,7 @@ app.get('/welcome', (req, res) => {
 
 app.get('/', (req, res) => {
   console.log("Calling here!");
-  res.redirect('/register'); //this will call the /login route in the API
+  res.redirect('/landing'); //this will call the landing page.
 });
 
 app.get('/loginStudent', (req, res) => {
