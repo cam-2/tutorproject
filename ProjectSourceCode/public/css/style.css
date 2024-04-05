@@ -11,25 +11,27 @@
 }
 
 .menu {
+    margin-left: 5%;
     box-sizing: border-box;
     position: relative;
     display: flex;
-    width: 49%;
+    width: 25%;
     gap: 4rem;
 }
 
 .nav-right {
 
+    margin-right: 5%;
     box-sizing: border-box;
     position: relative;
     display: flex;
-    width: 49%;
+    width: 25%;
     gap: 2rem;
     justify-content: flex-end;
 }
 
 .launchButton {
-    margin-top: 50px;
+    margin-top: 35%;
     position: absolute;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
@@ -47,6 +49,16 @@
     color:gray;
     text-align: center;
     font-size: 2em;
+}
+
+#searchBar {
+
+    margin-top: 20px;
+    position: absolute;
+    left: 50%;
+    -ms-transform: translate(-50%, 0%);
+    transform: translate(-50%, 0%);
+    
 }
 
 a {
