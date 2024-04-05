@@ -166,31 +166,31 @@ app.post('/register', async (req, res) => {
   const hash = await bcrypt.hash(req.body.password, 10);
 
   if(req.body.radio_button == "tutor"){
-    const insertQuery = 'INSERT INTO tutor (username, password) VALUES ($1, $2)';
+    const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
     const insertValues = [req.body.username, hash];
     // Execute the query
     let response = await db.any(insertQuery, insertValues);
     if(response.err) {
-      console.log('Error: Could not insert into db.');
-      res.redirect('/register');
+      console.log('Error: Could not insert into db - tutors table.');
+      res.get('/register');
     }
     else {
-      console.log('Success: User added to db.');
-      res.redirect('/login');
+      console.log('Success: User added to db - tutors table.');
+      res.redirect('/loginTutor');
     }
   }
   else{
-    const insertQuery = 'INSERT INTO student (username, password) VALUES ($1, $2)';
+    const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
     const insertValues = [req.body.username, hash];
     // Execute the query
     let response = await db.any(insertQuery, insertValues);
     if(response.err) {
-      console.log('Error: Could not insert into db.');
-      res.redirect('/register');
+      console.log('Error: Could not insert into db - students table.');
+      res.get('/register');
     }
     else {
-      console.log('Success: User added to db.');
-      res.redirect('/login');
+      console.log('Success: User added to db - students table.');
+      res.redirect('/loginStudent');
     }
   }
 });
