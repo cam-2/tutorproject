@@ -24,7 +24,8 @@ Once a student finds a tutor, the application provides the tutor’s email addre
 - Docker
 - Node.js
 - PostgreSQL
-- HTML/CSS
+- HBS
+- Express
 - Github
 
 ## Prerequisites to Run
