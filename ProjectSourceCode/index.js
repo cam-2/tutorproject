@@ -76,15 +76,15 @@ app.post('/register', async (req, res) => {
 
   const insertQuery = 'INSERT INTO students (subject_id, review_id, username, first_name, last_name, email, password, year, major) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
   const insertValues = [req.body.subject_id, req.body.review_id, req.body.username, req.body.first_name, req.body.last_name, req.body.email, hash, req.body.year, req.body.major];
-  // Execute the query
-  let response = await db.any(insertQuery, insertValues);
-  if (response.err) {
-    console.log('Error: Could not insert into db.');
-    res.redirect('/register');
-  }
-  else {
+  try {
+    await db.any(insertQuery, insertValues);
     console.log('Success: User added to db.');
-    res.redirect('/login');
+    // res.redirect('/login');
+    res.json({ status: 'success', message: 'Registered!' });
+  } catch (err) {
+    console.log('Error: Could not insert into db.');
+    // res.redirect('/register');
+    res.json({ status: 'fail', message: 'Invalid registration!' });
   }
 });
 
