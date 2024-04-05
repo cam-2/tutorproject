@@ -54,13 +54,15 @@ app.use(
   })
 );
 
+app.use(express.static(__dirname + '/public'));
+
 app.get('/welcome', (req, res) => {
   res.json({ status: 'success', message: 'Welcome!' });
 });
 
 app.get('/', (req, res) => {
   console.log("Calling here!");
-  res.redirect('/register'); //this will call the /login route in the API
+  res.redirect('/landing'); //this will call the landing page.
 });
 
 app.get('/loginStudent', (req, res) => {
@@ -70,6 +72,21 @@ app.get('/loginTutor', (req, res) => {
   res.render('./pages/loginTutor.hbs');
 });
 
+app.get('/landing', (req, res) => {
+  res.render('./pages/landingPage.hbs');
+});
+
+app.get('/discover', (req, res) => {
+  res.render('./pages/discover.hbs');
+});
+
+app.get('/profile', (req, res) => {
+  res.render('./pages/profile.hbs');
+});
+
+app.get('/about', (req, res) => {
+  res.render('./pages/about.hbs');
+});
 
 app.get('/register', (req, res) => {
   res.render('./pages/register.hbs');
