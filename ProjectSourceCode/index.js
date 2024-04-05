@@ -55,7 +55,7 @@ session({
 );
 
 app.get('/', (req, res) => {
-    console.log("Calling here!");
+    // console.log("Calling here!");
     res.redirect('/register'); //this will call the /login route in the API
 });
 
@@ -68,19 +68,35 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-  const hash = await bcrypt.hash(req.boody.password, 10);
+  const hash = await bcrypt.hash(req.body.password, 10);
 
-  const insertQuery = 'INSERT INTO student (username, password) VALUES ($1, $2)';
-  const insertValues = [req.body.username, hash];
-  // Execute the query
-  let response = await db.any(insertQuery, insertValues);
-  if(response.err) {
-    console.log('Error: Could not insert into db.');
-    res.redirect('/register');
+  if(req.body.radio_button == "tutor"){
+    const insertQuery = 'INSERT INTO tutor (username, password) VALUES ($1, $2)';
+    const insertValues = [req.body.username, hash];
+    // Execute the query
+    let response = await db.any(insertQuery, insertValues);
+    if(response.err) {
+      console.log('Error: Could not insert into db.');
+      res.redirect('/register');
+    }
+    else {
+      console.log('Success: User added to db.');
+      res.redirect('/login');
+    }
   }
-  else {
-    console.log('Success: User added to db.');
-    res.redirect('/login');
+  else{
+    const insertQuery = 'INSERT INTO student (username, password) VALUES ($1, $2)';
+    const insertValues = [req.body.username, hash];
+    // Execute the query
+    let response = await db.any(insertQuery, insertValues);
+    if(response.err) {
+      console.log('Error: Could not insert into db.');
+      res.redirect('/register');
+    }
+    else {
+      console.log('Success: User added to db.');
+      res.redirect('/login');
+    }
   }
 });
 
