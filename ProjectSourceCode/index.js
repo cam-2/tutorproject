@@ -19,11 +19,11 @@ const hbs = handlebars.create({
 
 // database configuration
 const dbConfig = {
-    host: 'db', // the database server
-    port: 5432, // the database port
-    database: process.env.POSTGRES_DB, // the database name
-    user: process.env.POSTGRES_USER, // the user account to connect with
-    password: process.env.POSTGRES_PASSWORD, // the password of the user account
+  host: 'db', // the database server
+  port: 5432, // the database port
+  database: process.env.POSTGRES_DB, // the database name
+  user: process.env.POSTGRES_USER, // the user account to connect with
+  password: process.env.POSTGRES_PASSWORD, // the password of the user account
 };
 
 const db = pgp(dbConfig);
@@ -47,34 +47,38 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 
 
 app.use(
-session({
+  session({
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     resave: false,
-})
+  })
 );
 
+app.get('/welcome', (req, res) => {
+  res.json({ status: 'success', message: 'Welcome!' });
+});
+
 app.get('/', (req, res) => {
-    console.log("Calling here!");
-    res.redirect('/register'); //this will call the /login route in the API
+  console.log("Calling here!");
+  res.redirect('/register'); //this will call the /login route in the API
 });
 
 app.get('/loginStudent', (req, res) => {
-    res.render('./pages/loginStudent.hbs');
+  res.render('./pages/loginStudent.hbs');
 });
 
 app.get('/register', (req, res) => {
-    res.render('./pages/register.hbs');
+  res.render('./pages/register.hbs');
 });
 
 app.post('/register', async (req, res) => {
-  const hash = await bcrypt.hash(req.boody.password, 10);
+  const hash = await bcrypt.hash(req.body.password, 10);
 
-  const insertQuery = 'INSERT INTO student (username, password) VALUES ($1, $2)';
-  const insertValues = [req.body.username, hash];
+  const insertQuery = 'INSERT INTO students (subject_id, review_id, username, first_name, last_name, email, password, year, major) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
+  const insertValues = [req.body.subject_id, req.body.review_id, req.body.username, req.body.first_name, req.body.last_name, req.body.email, hash, req.body.year, req.body.major];
   // Execute the query
   let response = await db.any(insertQuery, insertValues);
-  if(response.err) {
+  if (response.err) {
     console.log('Error: Could not insert into db.');
     res.redirect('/register');
   }
@@ -84,5 +88,5 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
