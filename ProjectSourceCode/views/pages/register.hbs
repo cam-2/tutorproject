@@ -1,5 +1,5 @@
 {{> message}}
-<body></body>
+<body>
 <center>
     <div style = "margin-top: 10%;">
         <font size="5">
@@ -21,7 +21,7 @@
             </label>
         </div>
         <div>
-            <input name='username'/>
+            <input name='username' required>
         </div>
         <div>
             <label for='password'>
@@ -29,10 +29,11 @@
             </label>
         </div>
         <div>
-            <input name="password"></input>
+            <input type = "password" name="password" required></input>
         </div>
         <div>
             <Button type='submit' class='btn btn-primary'>Submit</Button>
         </div>
     </form>
 </center>
+</body>

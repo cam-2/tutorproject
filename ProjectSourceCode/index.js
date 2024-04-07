@@ -1,6 +1,6 @@
 const express = require('express'); // To build an application server or API
 const app = express();
-const handlebars = require('express-handlebars'); //giving error worry later
+const handlebars = require('express-handlebars'); 
 const Handlebars = require('handlebars');
 const path = require('path');
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
@@ -42,8 +42,9 @@ db.connect()
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
-app.set('Scenes', path.join(__dirname, 'Scenes'));
+app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+
 
 
 app.use(
@@ -51,6 +52,12 @@ app.use(
     secret: process.env.SESSION_SECRET,
     saveUninitialized: false,
     resave: false,
+  })
+);
+
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
   })
 );
 
@@ -163,9 +170,10 @@ app.post('/loginTutor', async (req, res) => {
 
 
 app.post('/register', async (req, res) => {
+  console.log('req.body: ', req.body);
   const hash = await bcrypt.hash(req.body.password, 10);
 
-  if(req.body.radio_button == "tutor"){
+  if(req.body.tutor_student_rad == "tutor"){
     const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
     const insertValues = [req.body.username, hash];
     // Execute the query

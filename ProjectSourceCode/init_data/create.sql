@@ -1,26 +1,26 @@
 DROP TABLE IF EXISTS students;
 CREATE TABLE students (
     id SERIAL PRIMARY KEY NOT NULL,
-    subject_id INT NOT NULL,
-    review_id INT NOT NULL,
+    subject_id INT,
+    review_id INT,
     username VARCHAR(50) NOT NULL UNIQUE,
-    first_name VARCHAR(40) NOT NULL,
-    last_name VARCHAR(40) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    first_name VARCHAR(40),
+    last_name VARCHAR(40),
+    email VARCHAR(100),
     password VARCHAR(200) NOT NULL,
-    year INTEGER NOT NULL,
-    major VARCHAR(30) NOT NULL
+    year INTEGER,
+    major VARCHAR(30)
 );
 
 DROP TABLE IF EXISTS tutors;
 CREATE TABLE tutors (
     id SERIAL PRIMARY KEY NOT NULL,
-    subject_id INT NOT NULL,
-    review_id INT NOT NULL,
+    subject_id INT,
+    review_id INT,
     username VARCHAR(50) NOT NULL UNIQUE,
-    first_name VARCHAR(40) NOT NULL,
-    last_name VARCHAR(40) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    first_name VARCHAR(40),
+    last_name VARCHAR(40),
+    email VARCHAR(100),
     password VARCHAR(200) NOT NULL
 );
 
