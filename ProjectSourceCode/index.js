@@ -170,6 +170,10 @@ app.post('/loginTutor', async (req, res) => {
 
 
 app.post('/register', async (req, res) => {
+  if (!req.body.username || !req.body.password || !req.body.tutor_student_rad) {
+    return res.status(400).send('Missing required field');
+  }
+  
   console.log('req.body: ', req.body);
   const hash = await bcrypt.hash(req.body.password, 10);
 
