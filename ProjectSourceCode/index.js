@@ -167,6 +167,12 @@ app.post('/loginTutor', async (req, res) => {
   }
 });
 
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.render('pages/logout', {
+      message: "Was able to logout successfully!",
+  }); 
+});
 
 
 app.post('/register', async (req, res) => {
@@ -231,6 +237,7 @@ app.put('/registerInfoTutor', async (req, res) => {
   }
   else {
     console.log('Success: User modified - tutors table.');
+    req.session.destroy(); //logs out and redirects them to officially log in.
     res.redirect('/loginTutor');
   }
 });
@@ -252,6 +259,7 @@ app.put('/registerInfoStudent', async (req, res) => {
   }
   else {
     console.log('Success: User modified - student table.');
+    req.session.destroy(); //logs out and redirects them to officially log in.
     res.redirect('/loginStudent');
   }
 });
