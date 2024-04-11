@@ -64,3 +64,39 @@ describe('Testing Register API', () => {
             });
     });
 });
+
+describe('Testing Login API', () => {
+    it('positive : /loginTutor. Valid credentials', done => {
+        chai
+            .request(server)
+            .post('/loginTutor')
+            .redirects(0)
+            .send({
+                username: 'johndoe',
+                password: 'password123'
+            })
+            .end((err, res) => {
+                res.should.have.status(302);
+                res.should.redirectTo('/discover');
+                done();
+            });
+    });
+});
+
+describe('Testing Login API', () => {
+    it('negative : /loginTutor. Invalid username', done => {
+        chai
+            .request(server)
+            .post('/loginTutor')
+            .redirects(0)
+            .send({
+                username: 'invalid',
+                password: 'password123'
+            })
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.text.should.include('Username not found! Register here.');
+                done();
+            });
+    });
+});
