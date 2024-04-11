@@ -188,7 +188,10 @@ app.post('/register', async (req, res) => {
     }
     else {
       console.log('Success: User added to db - tutors table.');
-      res.redirect('/registerInfo');
+      const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+      req.session.user = user;
+      req.session.save();
+      res.redirect('/registerInfoTutor');
     }
   }
   else{
@@ -201,19 +204,24 @@ app.post('/register', async (req, res) => {
       res.get('/register');
     }
     else {
-      console.log('Success: User added to db - students table.');
-      res.redirect('/loginStudent');
+      console.log('Success: User added to db - tutors table.');
+      const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+      req.session.user = user;
+      req.session.save();
+      res.redirect('/registerInfoStudent');
     }
   }
 });
 
 
-app.put('/registerInfo', async (req, res) => {
+app.put('/registerInfoTutor', async (req, res) => {
   
   
   console.log('req.body: ', req.body);
+  console.log('user.body: ', user.body);
 
-  const updateQuery = 'UPDATE tutors (first_name, req.body.last_name, req.body.email) VALUES ($1, $2, $3)'; //need to add constraint
+  //can add more
+  const updateQuery = 'UPDATE tutors (first_name, req.body.last_name, req.body.email) VALUES ($1, $2, $3) WHERE tutor_id = user.tutor_id'; //Should work? need to test
   const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
   // Execute the query
   let response = await db.any(updateQuery, updateValues);
@@ -224,6 +232,27 @@ app.put('/registerInfo', async (req, res) => {
   else {
     console.log('Success: User modified - tutors table.');
     res.redirect('/loginTutor');
+  }
+});
+
+app.put('/registerInfoStudent', async (req, res) => {
+  
+  
+  console.log('req.body: ', req.body);
+  console.log('user.body: ', user.body);
+
+  //can add more
+  const updateQuery = 'UPDATE students (first_name, req.body.last_name, req.body.email) VALUES ($1, $2, $3) WHERE student_id = user.student_id'; //Should work? need to test
+  const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
+  // Execute the query
+  let response = await db.any(updateQuery, updateValues);
+  if(response.err) {
+    console.log('Error: Could not update - student table.');
+    res.get('/register');
+  }
+  else {
+    console.log('Success: User modified - student table.');
+    res.redirect('/loginStudent');
   }
 });
 
