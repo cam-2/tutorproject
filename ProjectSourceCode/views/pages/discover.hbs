@@ -1,0 +1,16 @@
+<div class="container mt-5">
+    <div class="row">
+        {{#each tutors}}
+        <div class="col-md-2 mb-4">
+            <div class="card h-100">
+                <img class="card-img-top" src="https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png" alt="{{firstName}} {{lastName}}'s picture">
+                <div class="card-body">
+                    <h5 class="card-title">{{firstName}} {{lastName}}</h5>
+                    <p class="card-text">Email: {{email}}</p>
+                    <a href="#" class="btn btn-primary">Book Now</a>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
