@@ -41,7 +41,7 @@ describe('Testing Register API', () => {
             })
             .end((err, res) => {
                 res.should.have.status(302);
-                res.should.redirectTo('/loginTutor');
+                res.should.redirectTo('/registerInfoTutor');
                 done();
             });
     });
