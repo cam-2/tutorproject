@@ -69,7 +69,7 @@ app.get('/welcome', (req, res) => {
 
 app.get('/', (req, res) => {
     // console.log("Calling here!");
-    res.redirect('/register'); //this will call the /login route in the API
+    res.redirect('/landing'); 
 });
 
 app.get('/loginStudent', (req, res) => {
@@ -97,6 +97,12 @@ app.get('/about', (req, res) => {
 
 app.get('/register', (req, res) => {
   res.render('./pages/register.hbs');
+});
+app.get('/registerInfoStudent', (req, res) => {
+  res.render('./pages/registerInfoStudent.hbs');
+});
+app.get('/registerInfoTutor', (req, res) => {
+  res.render('./pages/registerInfoTutor.hbs');
 });
 
 app.post('/loginStudent', async (req, res) => {
@@ -204,8 +210,8 @@ app.post('/register', async (req, res) => {
       res.get('/register');
     }
     else {
-      console.log('Success: User added to db - tutors table.');
-      const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+      console.log('Success: User added to db - students table.');
+      const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
       req.session.user = user;
       req.session.save();
       res.redirect('/registerInfoStudent');
@@ -214,14 +220,14 @@ app.post('/register', async (req, res) => {
 });
 
 
-app.put('/registerInfoTutor', async (req, res) => {
+app.post('/registerInfoTutor', async (req, res) => {
   
   
   console.log('req.body: ', req.body);
-  console.log('user.body: ', user.body);
+  console.log('req.session.user.id: ', req.session.user.id);
 
   //can add more
-  const updateQuery = 'UPDATE tutors (first_name, req.body.last_name, req.body.email) VALUES ($1, $2, $3) WHERE tutor_id = user.tutor_id'; //Should work? need to test
+  const updateQuery = 'UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = ' + req.session.user.id; //Should work? need to test
   const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
   // Execute the query
   let response = await db.any(updateQuery, updateValues);
@@ -235,14 +241,14 @@ app.put('/registerInfoTutor', async (req, res) => {
   }
 });
 
-app.put('/registerInfoStudent', async (req, res) => {
+app.post('/registerInfoStudent', async (req, res) => {
   
   
   console.log('req.body: ', req.body);
-  console.log('user.body: ', user.body);
+  console.log('req.session.user.id: ', req.session.user.id);
 
   //can add more
-  const updateQuery = 'UPDATE students (first_name, req.body.last_name, req.body.email) VALUES ($1, $2, $3) WHERE student_id = user.student_id'; //Should work? need to test
+  const updateQuery = 'UPDATE students SET first_name = $1, last_name = $2, email = $3 WHERE id = ' + req.session.user.id; //Should work? need to test
   const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
   // Execute the query
   let response = await db.any(updateQuery, updateValues);
@@ -251,7 +257,7 @@ app.put('/registerInfoStudent', async (req, res) => {
     res.get('/register');
   }
   else {
-    console.log('Success: User modified - student table.');
+    console.log('Success: User modified - students table.');
     res.redirect('/loginStudent');
   }
 });
