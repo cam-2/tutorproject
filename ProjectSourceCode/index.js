@@ -178,6 +178,18 @@ app.post('/register', async (req, res) => {
   const hash = await bcrypt.hash(req.body.password, 10);
 
   if(req.body.tutor_student_rad == "tutor"){
+    //The preemption logic makes sure that we don't try to make a INSERT query if the user already exists
+    const preemptQuery = 'SELECT id FROM tutors WHERE username = $1';
+    const preemptValue = [req.body.username];
+    let preemptResponse = await db.any(preemptQuery, preemptValue);
+    if(!preemptResponse.err){//if we didn't recieve an error, that means the value already exists (bad)
+      console.log('Error: This tutor already exists; cannot register.');
+      res.render('pages/loginTutor', {
+        error: true,
+        message: "Looks like you already have an account! Try logging in.",
+      });
+      res.redirect('/loginTutor');
+    }
     const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
     const insertValues = [req.body.username, hash];
     // Execute the query
@@ -192,6 +204,18 @@ app.post('/register', async (req, res) => {
     }
   }
   else{
+    //The preemption logic makes sure that we don't try to make a INSERT query if the user already exists
+    const preemptQuery = 'SELECT id FROM students WHERE username = $1';
+    const preemptValue = [req.body.username];
+    let preemptResponse = await db.any(preemptQuery, preemptValue);
+    if(!preemptResponse.err){//if we didn't recieve an error, that means the value already exists (bad)
+      console.log('Error: This student already exists; cannot register.');
+      res.render('pages/loginStudent', {
+        error: true,
+        message: "Looks like you already have an account! Try logging in.",
+      });
+      res.redirect('/loginStudent');
+    }
     const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
     const insertValues = [req.body.username, hash];
     // Execute the query
