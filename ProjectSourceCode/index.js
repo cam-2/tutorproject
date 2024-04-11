@@ -188,7 +188,7 @@ app.post('/register', async (req, res) => {
     }
     else {
       console.log('Success: User added to db - tutors table.');
-      res.redirect('/loginTutor');
+      res.redirect('/registerInfo');
     }
   }
   else{
@@ -204,6 +204,26 @@ app.post('/register', async (req, res) => {
       console.log('Success: User added to db - students table.');
       res.redirect('/loginStudent');
     }
+  }
+});
+
+
+app.put('/registerInfo', async (req, res) => {
+  
+  
+  console.log('req.body: ', req.body);
+
+  const updateQuery = 'UPDATE tutors (first_name, req.body.last_name, req.body.email) VALUES ($1, $2, $3)'; //need to add constraint
+  const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
+  // Execute the query
+  let response = await db.any(updateQuery, updateValues);
+  if(response.err) {
+    console.log('Error: Could not update - tutors table.');
+    res.get('/register');
+  }
+  else {
+    console.log('Success: User modified - tutors table.');
+    res.redirect('/loginTutor');
   }
 });
 
