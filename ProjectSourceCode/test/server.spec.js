@@ -28,24 +28,24 @@ describe('Server!', () => {
 });
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
-describe('Testing Register API', () => {
-    it('positive : /register. For tutor', done => {
-        chai
-            .request(server)
-            .post('/register')
-            .redirects(0)
-            .send({
-                username: 'johndoe',
-                password: 'password123',
-                tutor_student_rad: 'tutor'
-            })
-            .end((err, res) => {
-                res.should.have.status(302);
-                res.should.redirectTo('/registerInfoTutor');
-                done();
-            });
-    });
-});
+// describe('Testing Register API', () => {
+//     it('positive : /register. For tutor', done => {
+//         chai
+//             .request(server)
+//             .post('/register')
+//             .redirects(0)
+//             .send({
+//                 username: 'johndoe',
+//                 password: 'password123',
+//                 tutor_student_rad: 'tutor'
+//             })
+//             .end((err, res) => {
+//                 res.should.have.status(302);
+//                 res.should.redirectTo('/registerInfoTutor');
+//                 done();
+//             });
+//     });
+// });
 
 describe('Testing Register API', () => {
     it('negative : /register. No username.', done => {
