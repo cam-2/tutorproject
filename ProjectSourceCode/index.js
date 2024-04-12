@@ -63,6 +63,37 @@ app.use(
 
 app.use(express.static(__dirname + '/public'));
 
+async function getTutorAverageRating(tutorId) {
+  try {
+    // get avg rating from ratings table for the tutor  
+    const result = await db.oneOrNone('SELECT AVG(rating) as average_rating FROM ratings WHERE tutor_id = $1', [tutorId]);  
+    // check if the result and avg are not empty
+    if (result && result.average_rating) return parseFloat(result.average_rating).toFixed(2);
+    // else return 'No ratings yet'
+    else return 'No ratings yet';
+  } catch (error) {
+    // err handling
+    console.log('Error getting rating:', error);
+    throw error;
+  }
+}
+
+app.get('/tutorProfile/:tutorId', async (req, res) => {
+  const tutorId = req.params.tutorId;
+  try {
+    // get tutor given an id
+    const tutorDetails = await db.one('SELECT * FROM tutors WHERE id = $1', [tutorId]);
+    // calc avg rating for a tutor
+    const averageRating = await getTutorAverageRating(tutorId);
+    // render page with given tutor and rating
+    res.render('./pages/tutorProfile.hbs', { tutor: tutorDetails, averageRating: averageRating });
+  } catch (error) {
+    // err handling 
+    console.log('Error in tutorProfile route:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.get('/welcome', (req, res) => {
   res.json({ status: 'success', message: 'Welcome!' });
 });

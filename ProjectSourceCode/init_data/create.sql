@@ -36,3 +36,16 @@ CREATE TABLE review (
     rating SMALLINT NOT NULL,
     summary VARCHAR(500)
 );
+
+
+
+
+DROP TABLE IF EXISTS ratings;
+CREATE TABLE ratings (
+    rating_id SERIAL PRIMARY KEY NOT NULL,
+    tutor_id INT NOT NULL,
+    student_id INT NOT NULL,
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    FOREIGN KEY (tutor_id) REFERENCES tutors(id),
+    FOREIGN KEY (student_id) REFERENCES students(id)
+);
