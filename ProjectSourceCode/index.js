@@ -209,7 +209,6 @@ app.post('/register', async (req, res) => {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
-      // res.redirect('/loginTutor');
     }
     else{
       const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
@@ -222,7 +221,10 @@ app.post('/register', async (req, res) => {
       }
       else {
         console.log('Success: User added to db - tutors table.');
-        res.redirect('/loginTutor');
+        const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+        req.session.user = user;
+        req.session.save();
+        res.redirect('/registerInfoTutor');
       }
     }
   }
@@ -237,7 +239,6 @@ app.post('/register', async (req, res) => {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
-      // res.redirect('/loginStudent');
     }
     else{
       const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
@@ -250,7 +251,10 @@ app.post('/register', async (req, res) => {
       }
       else {
         console.log('Success: User added to db - students table.');
-        res.redirect('/loginStudent');
+        const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+        req.session.user = user;
+        req.session.save();
+        res.redirect('/registerInfoStudent');
       }
     }
   }
