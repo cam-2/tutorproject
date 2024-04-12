@@ -204,38 +204,64 @@ app.post('/register', async (req, res) => {
   console.log('req.body: ', req.body);
   const hash = await bcrypt.hash(req.body.password, 10);
 
-  if (req.body.tutor_student_rad == "tutor") {
-    const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
-    const insertValues = [req.body.username, hash];
-    // Execute the query
-    let response = await db.any(insertQuery, insertValues);
-    if (response.err) {
-      console.log('Error: Could not insert into db - tutors table.');
-      res.get('/register');
+  if(req.body.tutor_student_rad == "tutor"){
+    //The preemption logic makes sure that we don't try to make a INSERT query if the user already exists
+    const preemptQuery = 'SELECT id FROM tutors WHERE username = $1';
+    const preemptValue = [req.body.username];
+    let preemptResponse = await db.any(preemptQuery, preemptValue);
+    if(preemptResponse.length != 0){//if we didn't recieve an error, that means the value already exists (bad)
+      console.log('Error: This tutor already exists; cannot register.');
+      res.render('pages/loginTutor', {
+        error: true,
+        message: "Looks like you already have an account! Try logging in.",
+      });
     }
-    else {
-      console.log('Success: User added to db - tutors table.');
-      const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
-      req.session.user = user;
-      req.session.save();
-      res.redirect('/registerInfoTutor');
+    else{
+      const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
+      const insertValues = [req.body.username, hash];
+      // Execute the query
+      let response = await db.any(insertQuery, insertValues);
+      if(response.err) {
+        console.log('Error: Could not insert into db - tutors table.');
+        res.get('/register');
+      }
+      else {
+        console.log('Success: User added to db - tutors table.');
+        const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+        req.session.user = user;
+        req.session.save();
+        res.redirect('/registerInfoTutor');
+      }
     }
   }
-  else {
-    const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
-    const insertValues = [req.body.username, hash];
-    // Execute the query
-    let response = await db.any(insertQuery, insertValues);
-    if (response.err) {
-      console.log('Error: Could not insert into db - students table.');
-      res.get('/register');
+  else{
+    //The preemption logic makes sure that we don't try to make a INSERT query if the user already exists
+    const preemptQuery = 'SELECT id FROM students WHERE username = $1';
+    const preemptValue = [req.body.username];
+    let preemptResponse = await db.any(preemptQuery, preemptValue);
+    if(preemptResponse.length != 0){//if we didn't recieve an error, that means the value already exists (bad)
+      console.log('Error: This student already exists; cannot register.');
+      res.redirect('pages/loginStudent', {
+        error: true,
+        message: "Looks like you already have an account! Try logging in.",
+      });
     }
-    else {
-      console.log('Success: User added to db - students table.');
-      const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
-      req.session.user = user;
-      req.session.save();
-      res.redirect('/registerInfoStudent');
+    else{
+      const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
+      const insertValues = [req.body.username, hash];
+      // Execute the query
+      let response = await db.any(insertQuery, insertValues);
+      if(response.err) {
+        console.log('Error: Could not insert into db - students table.');
+        res.get('/register');
+      }
+      else {
+        console.log('Success: User added to db - students table.');
+        const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+        req.session.user = user;
+        req.session.save();
+        res.redirect('/registerInfoStudent');
+      }
     }
   }
 });
