@@ -182,25 +182,27 @@ app.post('/register', async (req, res) => {
     const preemptQuery = 'SELECT id FROM tutors WHERE username = $1';
     const preemptValue = [req.body.username];
     let preemptResponse = await db.any(preemptQuery, preemptValue);
-    if(!preemptResponse.err){//if we didn't recieve an error, that means the value already exists (bad)
+    if(preemptResponse.length != 0){//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This tutor already exists; cannot register.');
       res.render('pages/loginTutor', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
-      res.redirect('/loginTutor');
+      // res.redirect('/loginTutor');
     }
-    const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
-    const insertValues = [req.body.username, hash];
-    // Execute the query
-    let response = await db.any(insertQuery, insertValues);
-    if(response.err) {
-      console.log('Error: Could not insert into db - tutors table.');
-      res.get('/register');
-    }
-    else {
-      console.log('Success: User added to db - tutors table.');
-      res.redirect('/loginTutor');
+    else{
+      const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
+      const insertValues = [req.body.username, hash];
+      // Execute the query
+      let response = await db.any(insertQuery, insertValues);
+      if(response.err) {
+        console.log('Error: Could not insert into db - tutors table.');
+        res.get('/register');
+      }
+      else {
+        console.log('Success: User added to db - tutors table.');
+        res.redirect('/loginTutor');
+      }
     }
   }
   else{
@@ -208,25 +210,27 @@ app.post('/register', async (req, res) => {
     const preemptQuery = 'SELECT id FROM students WHERE username = $1';
     const preemptValue = [req.body.username];
     let preemptResponse = await db.any(preemptQuery, preemptValue);
-    if(!preemptResponse.err){//if we didn't recieve an error, that means the value already exists (bad)
+    if(preemptResponse.length != 0){//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This student already exists; cannot register.');
-      res.render('pages/loginStudent', {
+      res.redirect('pages/loginStudent', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
-      res.redirect('/loginStudent');
+      // res.redirect('/loginStudent');
     }
-    const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
-    const insertValues = [req.body.username, hash];
-    // Execute the query
-    let response = await db.any(insertQuery, insertValues);
-    if(response.err) {
-      console.log('Error: Could not insert into db - students table.');
-      res.get('/register');
-    }
-    else {
-      console.log('Success: User added to db - students table.');
-      res.redirect('/loginStudent');
+    else{
+      const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
+      const insertValues = [req.body.username, hash];
+      // Execute the query
+      let response = await db.any(insertQuery, insertValues);
+      if(response.err) {
+        console.log('Error: Could not insert into db - students table.');
+        res.get('/register');
+      }
+      else {
+        console.log('Success: User added to db - students table.');
+        res.redirect('/loginStudent');
+      }
     }
   }
 });
