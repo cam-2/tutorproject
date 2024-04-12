@@ -1,6 +1,6 @@
 const express = require('express'); // To build an application server or API
 const app = express();
-const handlebars = require('express-handlebars'); 
+const handlebars = require('express-handlebars');
 const Handlebars = require('handlebars');
 const path = require('path');
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
@@ -69,7 +69,7 @@ app.get('/welcome', (req, res) => {
 
 app.get('/', (req, res) => {
     // console.log("Calling here!");
-    res.redirect('/register'); //this will call the /login route in the API
+    res.redirect('/landing'); 
 });
 
 app.get('/loginStudent', (req, res) => {
@@ -83,8 +83,23 @@ app.get('/landing', (req, res) => {
   res.render('./pages/landingPage.hbs');
 });
 
-app.get('/discover', (req, res) => {
-  res.render('./pages/discover.hbs');
+app.get('/discover', async (req, res) => {
+  try {
+    const tutors = await db.any('SELECT * FROM tutors;');
+
+    const tutorData = tutors.map(tutor => ({
+      id: tutor.id,
+      username: tutor.username,
+      firstName: tutor.first_name,
+      lastName: tutor.last_name,
+      email: tutor.email
+    }));
+
+    res.render('pages/discover', { tutors: tutorData });
+  } catch (error) {
+    console.error(error);
+    res.render('pages/discover', { tutors: [], message: 'An error occurred while fetching tutors.', error: true });
+  }
 });
 
 app.get('/profile', (req, res) => {
@@ -98,6 +113,12 @@ app.get('/about', (req, res) => {
 app.get('/register', (req, res) => {
   res.render('./pages/register.hbs');
 });
+app.get('/registerInfoStudent', (req, res) => {
+  res.render('./pages/registerInfoStudent.hbs');
+});
+app.get('/registerInfoTutor', (req, res) => {
+  res.render('./pages/registerInfoTutor.hbs');
+});
 
 app.post('/loginStudent', async (req, res) => {
 
@@ -105,31 +126,31 @@ app.post('/loginStudent', async (req, res) => {
   try {
     const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]);
     try {
-        
-        const password = req.body.password;;
-        const match = await bcrypt.compare(password, user.password);
-    
-        if (match) {
-          // Save user details in the session
-          req.session.user = user;
-          req.session.save();
-          res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
-        } else {
-          // Incorrect password
-          res.render('pages/loginStudent', {
-            error: true,
-            message: "Incorrect password.",
-          });
-        }
-      } catch (error) { //should not happen
-        console.error('Error during password comparison:', error);
-        res.status(500).send('Internal Server Error');
+
+      const password = req.body.password;;
+      const match = await bcrypt.compare(password, user.password);
+
+      if (match) {
+        // Save user details in the session
+        req.session.user = user;
+        req.session.save();
+        res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
+      } else {
+        // Incorrect password
+        res.render('pages/loginStudent', {
+          error: true,
+          message: "Incorrect password.",
+        });
       }
+    } catch (error) { //should not happen
+      console.error('Error during password comparison:', error);
+      res.status(500).send('Internal Server Error');
+    }
   } catch (error) {
     res.render('pages/register', {
-        error: true,
-        message: "Username not found! Register here.",
-      });
+      error: true,
+      message: "Username not found! Register here.",
+    });
   }
 });
 
@@ -139,31 +160,31 @@ app.post('/loginTutor', async (req, res) => {
   try {
     const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]);
     try {
-        
-        const password = req.body.password;;
-        const match = await bcrypt.compare(password, user.password);
-    
-        if (match) {
-          // Save user details in the session
-          req.session.user = user;
-          req.session.save();
-          res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
-        } else {
-          // Incorrect password
-          res.render('pages/loginStudent', {
-            error: true,
-            message: "Incorrect password.",
-          });
-        }
-      } catch (error) { //should not happen
-        console.error('Error during password comparison:', error);
-        res.status(500).send('Internal Server Error');
+
+      const password = req.body.password;;
+      const match = await bcrypt.compare(password, user.password);
+
+      if (match) {
+        // Save user details in the session
+        req.session.user = user;
+        req.session.save();
+        res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
+      } else {
+        // Incorrect password
+        res.render('pages/loginStudent', {
+          error: true,
+          message: "Incorrect password.",
+        });
       }
+    } catch (error) { //should not happen
+      console.error('Error during password comparison:', error);
+      res.status(500).send('Internal Server Error');
+    }
   } catch (error) {
     res.render('pages/register', {
-        error: true,
-        message: "Username not found! Register here.",
-      });
+      error: true,
+      message: "Username not found! Register here.",
+    });
   }
 });
 
@@ -173,65 +194,86 @@ app.post('/register', async (req, res) => {
   if (!req.body.username || !req.body.password || !req.body.tutor_student_rad) {
     return res.status(400).send('Missing required field');
   }
-  
+
   console.log('req.body: ', req.body);
   const hash = await bcrypt.hash(req.body.password, 10);
 
-  if(req.body.tutor_student_rad == "tutor"){
-    //The preemption logic makes sure that we don't try to make a INSERT query if the user already exists
-    const preemptQuery = 'SELECT id FROM tutors WHERE username = $1';
-    const preemptValue = [req.body.username];
-    let preemptResponse = await db.any(preemptQuery, preemptValue);
-    if(preemptResponse.length != 0){//if we didn't recieve an error, that means the value already exists (bad)
-      console.log('Error: This tutor already exists; cannot register.');
-      res.render('pages/loginTutor', {
-        error: true,
-        message: "Looks like you already have an account! Try logging in.",
-      });
-      // res.redirect('/loginTutor');
+  if (req.body.tutor_student_rad == "tutor") {
+    const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
+    const insertValues = [req.body.username, hash];
+    // Execute the query
+    let response = await db.any(insertQuery, insertValues);
+    if (response.err) {
+      console.log('Error: Could not insert into db - tutors table.');
+      res.get('/register');
     }
-    else{
-      const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
-      const insertValues = [req.body.username, hash];
-      // Execute the query
-      let response = await db.any(insertQuery, insertValues);
-      if(response.err) {
-        console.log('Error: Could not insert into db - tutors table.');
-        res.get('/register');
-      }
-      else {
-        console.log('Success: User added to db - tutors table.');
-        res.redirect('/loginTutor');
-      }
+    else {
+      console.log('Success: User added to db - tutors table.');
+      const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+      req.session.user = user;
+      req.session.save();
+      res.redirect('/registerInfoTutor');
     }
   }
-  else{
-    //The preemption logic makes sure that we don't try to make a INSERT query if the user already exists
-    const preemptQuery = 'SELECT id FROM students WHERE username = $1';
-    const preemptValue = [req.body.username];
-    let preemptResponse = await db.any(preemptQuery, preemptValue);
-    if(preemptResponse.length != 0){//if we didn't recieve an error, that means the value already exists (bad)
-      console.log('Error: This student already exists; cannot register.');
-      res.redirect('pages/loginStudent', {
-        error: true,
-        message: "Looks like you already have an account! Try logging in.",
-      });
-      // res.redirect('/loginStudent');
+  else {
+    const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
+    const insertValues = [req.body.username, hash];
+    // Execute the query
+    let response = await db.any(insertQuery, insertValues);
+    if (response.err) {
+      console.log('Error: Could not insert into db - students table.');
+      res.get('/register');
     }
-    else{
-      const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
-      const insertValues = [req.body.username, hash];
-      // Execute the query
-      let response = await db.any(insertQuery, insertValues);
-      if(response.err) {
-        console.log('Error: Could not insert into db - students table.');
-        res.get('/register');
-      }
-      else {
-        console.log('Success: User added to db - students table.');
-        res.redirect('/loginStudent');
-      }
+    else {
+      console.log('Success: User added to db - students table.');
+      const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]); //temporary forced login.
+      req.session.user = user;
+      req.session.save();
+      res.redirect('/registerInfoStudent');
     }
+  }
+});
+
+
+app.post('/registerInfoTutor', async (req, res) => {
+  
+  
+  console.log('req.body: ', req.body);
+  console.log('req.session.user.id: ', req.session.user.id);
+
+  //can add more
+  const updateQuery = 'UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = ' + req.session.user.id; //Should work? need to test
+  const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
+  // Execute the query
+  let response = await db.any(updateQuery, updateValues);
+  if(response.err) {
+    console.log('Error: Could not update - tutors table.');
+    res.get('/register');
+  }
+  else {
+    console.log('Success: User modified - tutors table.');
+    res.redirect('/loginTutor');
+  }
+});
+
+app.post('/registerInfoStudent', async (req, res) => {
+  
+  
+  console.log('req.body: ', req.body);
+  console.log('req.session.user.id: ', req.session.user.id);
+
+  //can add more
+  const updateQuery = 'UPDATE students SET first_name = $1, last_name = $2, email = $3 WHERE id = ' + req.session.user.id; //Should work? need to test
+  const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
+  // Execute the query
+  let response = await db.any(updateQuery, updateValues);
+  if(response.err) {
+    console.log('Error: Could not update - student table.');
+    res.get('/register');
+  }
+  else {
+    console.log('Success: User modified - students table.');
+    res.redirect('/loginStudent');
   }
 });
 
