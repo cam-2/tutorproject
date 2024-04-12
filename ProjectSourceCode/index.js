@@ -134,7 +134,7 @@ app.post('/loginStudent', async (req, res) => {
         // Save user details in the session
         req.session.user = user;
         req.session.save();
-        res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
+        res.redirect('/discover'); //or whatever landing page? Calendar maybe?
       } else {
         // Incorrect password
         res.render('pages/loginStudent', {
@@ -171,7 +171,7 @@ app.post('/loginTutor', async (req, res) => {
         res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
       } else {
         // Incorrect password
-        res.render('pages/loginStudent', {
+        res.render('pages/loginTutor', {
           error: true,
           message: "Incorrect password.",
         });
@@ -188,6 +188,12 @@ app.post('/loginTutor', async (req, res) => {
   }
 });
 
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.render('pages/logout', {
+      message: "Was able to logout successfully!",
+  }); 
+});
 
 
 app.post('/register', async (req, res) => {
@@ -278,6 +284,7 @@ app.post('/registerInfoTutor', async (req, res) => {
   }
   else {
     console.log('Success: User modified - tutors table.');
+    req.session.destroy(); //logs out and redirects them to officially log in.
     res.redirect('/loginTutor');
   }
 });
