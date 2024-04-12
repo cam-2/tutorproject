@@ -30,8 +30,17 @@ CREATE TABLE tutors (
 --     id SERIAL PRIMARY KEY NOT NULL,
 --     name VARCHAR(30)
 -- );
+DROP TABLE IF EXISTS ratings; -- TABLE USED FOR RATING SYSTEM!
+CREATE TABLE ratings (
+    rating_id SERIAL PRIMARY KEY NOT NULL,
+    tutor_id INT NOT NULL,
+    student_id INT NOT NULL,
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    FOREIGN KEY (tutor_id) REFERENCES tutors(id),
+    FOREIGN KEY (student_id) REFERENCES students(id)
+);
 
-DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS reviews; -- not sure if needed, not used in the rating system
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY NOT NULL,
     rating SMALLINT NOT NULL,
