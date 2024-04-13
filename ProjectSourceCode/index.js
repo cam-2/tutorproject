@@ -298,6 +298,57 @@ app.post('/register', async (req, res) => {
   }
 });
 
+app.post("/search", async (req,res) => {
+
+  try {
+
+    const query = await db.any(`SELECT * FROM tutors WHERE first_name LIKE '$1' OR last_name LIKE '$1' or subject LIKE '$1'`, [req.body.search]);
+    if(query) {
+
+      const tutorData = query.map(tutor => ({
+        id: tutor.id,
+        username: tutor.username,
+        firstName: tutor.first_name,
+        lastName: tutor.last_name,
+        email: tutor.email
+      }));
+
+      res.render('pages/discover', { query: tutorData });
+    }
+
+    query = await db.any(`SELECT * FROM tutors INNER JOIN subjects ON tutors.id = subjects.id WHERE subjects.name LIKE '$1'`, [req.body.search])
+    if(query) {
+
+      const tutorData = query.map(tutor => ({
+        id: tutor.id,
+        username: tutor.username,
+        firstName: tutor.first_name,
+        lastName: tutor.last_name,
+        email: tutor.email
+      }));
+
+      res.render('pages/discover', { query: tutorData });
+    }
+  }
+  catch(error) {
+
+    console.error(error);
+    res.render('pages/discover', { query: [], message: 'An error occurred while fetching tutors.', error: true });
+  }
+});
+
+
+// Authentication Middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
+};
+
+app.use(auth);
+
 
 app.post('/registerInfoTutor', async (req, res) => {
   

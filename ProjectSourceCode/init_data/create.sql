@@ -25,11 +25,12 @@ CREATE TABLE tutors (
     -- fk_avail_id INT REFERENCES availabilities(id)
 );
 
--- DROP TABLE IF EXISTS subject;
--- CREATE TABLE subject (
---     id SERIAL PRIMARY KEY NOT NULL,
---     name VARCHAR(30)
--- );
+DROP TABLE IF EXISTS subject;
+CREATE TABLE subject (
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR(30)
+);
+
 DROP TABLE IF EXISTS ratings; -- TABLE USED FOR RATING SYSTEM!
 CREATE TABLE ratings (
     rating_id SERIAL PRIMARY KEY NOT NULL,
