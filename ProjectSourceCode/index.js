@@ -302,7 +302,7 @@ app.post("/search", async (req,res) => {
 
   try {
 
-    const query = await db.any(`SELECT * FROM tutors WHERE first_name LIKE '$1' OR last_name LIKE '$1' or subject LIKE '$1'`, [req.body.search]);
+    const query = await db.any(`SELECT * FROM tutors WHERE first_name LIKE '$1' OR last_name LIKE '$1'`, [req.body.search]);
     if(query) {
 
       const tutorData = query.map(tutor => ({
@@ -316,7 +316,7 @@ app.post("/search", async (req,res) => {
       res.render('pages/discover', { query: tutorData });
     }
 
-    query = await db.any(`SELECT * FROM tutors INNER JOIN subjects ON tutors.id = subjects.id WHERE subjects.name LIKE '$1'`, [req.body.search])
+    query = await db.any(`SELECT * FROM tutors INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id WHERE subjects.subject_name LIKE '$1'`, [req.body.search])
     if(query) {
 
       const tutorData = query.map(tutor => ({
