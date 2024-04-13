@@ -302,7 +302,7 @@ app.post("/search", async (req,res) => {
 
   try {
 
-    const query = await db.any(`SELECT * FROM tutors WHERE first_name LIKE '$1' OR last_name LIKE '$1' or subject LIKE '$1'`, [req.body.search]);
+    const query = await db.any(`SELECT * FROM tutors WHERE first_name LIKE '$1' OR last_name LIKE '$1'`, [req.body.search]);
     if(query) {
 
       const tutorData = query.map(tutor => ({
