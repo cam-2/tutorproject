@@ -14,8 +14,6 @@ CREATE TABLE students (
 DROP TABLE IF EXISTS tutors;
 CREATE TABLE tutors (
     id SERIAL PRIMARY KEY NOT NULL,
-    -- fk_subject_id INT REFERENCES subject(id),
-    subject VARCHAR(20),
     -- fk_review_id INT REFERENCES tut_to_review(id),
     username VARCHAR(50) NOT NULL UNIQUE,
     first_name VARCHAR(40),
@@ -25,10 +23,16 @@ CREATE TABLE tutors (
     -- fk_avail_id INT REFERENCES availabilities(id)
 );
 
-DROP TABLE IF EXISTS subject;
-CREATE TABLE subject (
-    id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR(30)
+DROP TABLE IF EXISTS subjects;
+CREATE TABLE subjects (
+    subject_id NUMERIC PRIMARY KEY NOT NULL,
+    subject_name VARCHAR(30)
+);
+
+DROP TABLE IF EXISTS tutor_subjects;
+CREATE TABLE tutor_subjects (
+  subject_id INTEGER NOT NULL REFERENCES subjects (subject_id),
+  tutor_id INTEGER NOT NULL REFERENCES tutors (id)
 );
 
 DROP TABLE IF EXISTS ratings; -- TABLE USED FOR RATING SYSTEM!
