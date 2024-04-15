@@ -303,10 +303,9 @@ app.post("/search", async (req,res) => {
 
   try {
 
-    var query = await db.any(`SELECT * FROM tutors WHERE first_name LIKE $1 OR last_name LIKE $1`, [req.body.search]);
-    if(query) {
-
-      const tutorData = query.map(tutor => ({
+    var tutors = await db.any(`SELECT * FROM tutors WHERE first_name ILIKE $1 OR last_name ILIKE $1`, [req.body.search]);
+    if(tutors.length != 0) {
+      const tutorData = tutors.map(tutor => ({
         id: tutor.id,
         username: tutor.username,
         firstName: tutor.first_name,
@@ -314,14 +313,14 @@ app.post("/search", async (req,res) => {
         email: tutor.email
       }));
 
-      res.render('pages/discover', { query: tutorData });
+      res.render('pages/discover', { tutors: tutorData });
     }
 
     else {
-      query = await db.any(`SELECT * FROM tutors INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id WHERE subjects.subject_name LIKE $1`, [req.body.search])
-      if(query) {
+      tutors = await db.any(`SELECT * FROM tutors INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id WHERE subjects.subject_name ILIKE $1`, [req.body.search])
+      if(tutors) {
 
-        const tutorData = query.map(tutor => ({
+        const tutorData = tutors.map(tutor => ({
           id: tutor.id,
           username: tutor.username,
           firstName: tutor.first_name,
@@ -329,19 +328,19 @@ app.post("/search", async (req,res) => {
           email: tutor.email
         }));
 
-        res.render('pages/discover', { query: tutorData });
+        res.render('pages/discover', { tutors: tutorData });
       } 
 
       else {
         error = true;
-        res.redirect('/discover', {query: [], message: "No matching results found."});
+        res.redirect('/discover', {tutors: [], message: "No matching results found."});
       }
     }
   }
   catch(error) {
 
     console.error(error);
-    res.render('pages/discover', { query: [], message: 'An error occurred while fetching tutors.', error: true });
+    res.render('pages/discover', { tutors: [], message: 'An error occurred while fetching tutors.', error: true });
   }
 });
 
