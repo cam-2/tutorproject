@@ -135,12 +135,22 @@ app.get('/tutorProfile/:tutorId', async (req, res) => {
 });
 
 
-app.get('/profile', (req, res) => {
-  res.render('./pages/profile.hbs');
+app.get('/about/:name', async (req, res) => {
+
+try {
+  // get tutor with a id from the params
+  const tutorDetails = await db.one('SELECT * FROM tutors WHERE id = $1', [req.params.name]);
+  // render page with given tutor
+  res.render('./pages/about.hbs', { tutor: tutorDetails});
+} catch (error) {
+  // err handling 
+  console.log('Error loading about', error);
+  res.status(500).send('Internal Server Error');
+}
 });
 
-app.get('/about', (req, res) => {
-  res.render('./pages/about.hbs');
+app.get('/profile', (req, res) => {
+  res.render('./pages/profile.hbs');
 });
 
 app.get('/register', (req, res) => {

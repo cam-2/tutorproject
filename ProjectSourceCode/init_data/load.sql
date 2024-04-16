@@ -16,18 +16,24 @@ VALUES
 ('student8', 'Eighth', 'Student8', 'student8@example.com', 'password8', 4, 'Major8'),
 ('student9', 'Ninth', 'Student9', 'student9@example.com', 'password9', 1, 'Major9'),
 ('student10', 'Tenth', 'Student10', 'student10@example.com', 'password10', 2, 'Major10');
-INSERT INTO tutors (username, first_name, last_name, email, password)
+INSERT INTO tutors (username, first_name, last_name, about, email, password)
 VALUES
-('tutor1', 'First', 'Tutor1', 'tutor1@example.com', 'password1'),
-('tutor2', 'Second', 'Tutor2', 'tutor2@example.com', 'password2'),
-('tutor3', 'Third', 'Tutor3', 'tutor3@example.com', 'password3'),
-('tutor4', 'Fourth', 'Tutor4', 'tutor4@example.com', 'password4'),
-('tutor5', 'Fifth', 'Tutor5', 'tutor5@example.com', 'password5'),
-('tutor6', 'Sixth', 'Tutor6', 'tutor6@example.com', 'password6'),
-('tutor7', 'Seventh', 'Tutor7', 'tutor7@example.com', 'password7'),
-('tutor8', 'Eighth', 'Tutor8', 'tutor8@example.com', 'password8'),
-('tutor9', 'Ninth', 'Tutor9', 'tutor9@example.com', 'password9'),
-('tutor10', 'Tenth', 'Tutor10', 'tutor10@example.com', 'password10');
+('tutor1', 'First', 'Tutor1', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis 
+dis parturient montes, nascetur ridiculus mus. Donec ultricies nec, pellentesque 
+eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, 
+aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, 
+justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibu','tutor1@example.com', 
+'password1'),
+('tutor2', 'Second', 'Tutor2','asdsdsdasdas', 'tutor2@example.com', 'password2'),
+('tutor3', 'Third', 'Tutor3','asadasgsdagdbcx', 'tutor3@example.com', 'password3'),
+('tutor4', 'Fourth', 'Tutor4','aslkdfhsalkjdhflsksljfgs;lkf;s', 'tutor4@example.com', 'password4'),
+('tutor5', 'Fifth', 'Tutor5','jkdhglkjdnm,cxnlkbjhljkwebnm,sdbngliheiulg', 'tutor5@example.com', 'password5'),
+('tutor6', 'Sixth', 'Tutor6','3ouhjscnxvp9p1y34jknlfnvxz98j', 'tutor6@example.com', 'password6'),
+('tutor7', 'Seventh', 'Tutor7','1289ulknvxzlkjvh9831hnrjkl1bo8b', 'tutor7@example.com', 'password7'),
+('tutor8', 'Eighth', 'Tutor8','1o23hjfdsnlfjknasdlkjnl', 'tutor8@example.com', 'password8'),
+('tutor9', 'Ninth', 'Tutor9','skjfhnasdlibvm,x lkjdsbflkjsbdlk', 'tutor9@example.com', 'password9'),
+('tutor10', 'Tenth', 'Tutor10','wejhfkjlsdnflisadbcklaslkj', 'tutor10@example.com', 'password10');
 
 INSERT INTO ratings (tutor_id, student_id, rating)
 VALUES
