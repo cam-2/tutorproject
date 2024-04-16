@@ -10,13 +10,37 @@
     align-items: center;
 }
 
+.navbar input[type = text] {
+
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    float: right;
+    padding: 6px;
+    border: 1px solid grey;
+    border-radius: 10px;
+}
+
 .menu {
-    margin-left: 2%;
+
+    margin-left: 5%;
     box-sizing: border-box;
     position: relative;
     display: flex;
-    width: 25%;
+    width: 10%;
     gap: 4rem;
+}
+
+.menu a {
+
+    color: black;
+    font-size: 1.25em;
+    text-decoration: none;
+}
+
+.menu a:hover {
+
+    opacity: 70%;
 }
 
 .nav-right {
@@ -25,9 +49,21 @@
     box-sizing: border-box;
     position: relative;
     display: flex;
-    width: 25%;
-    gap: 2rem;
+    width: 40%;
+    gap: 2.5rem;
     justify-content: flex-end;
+
+}
+
+.nav-right a {
+
+    color: black;
+    font-size: 1.25em;
+    text-decoration: none;
+}
+.nav-right a:hover {
+
+    opacity: 70%;
 }
 
 .launchButton {
@@ -38,14 +74,24 @@
     transform: translate(-50%, -50%);
 }
 
+#landing {
+
+    margin-left: 20px;
+}
+
 #welcomeText {
-    margin: 100px;
+
+    margin-top: 150px;
     position: relative;
     text-align: center;
-    font-size: 4em;
+    font-size: 5em;
+    font-weight: bolder;
+    margin-bottom: 50px;
 }
 
 #sloganText {
+
+    font-weight: lighter;
     color:gray;
     text-align: center;
     font-size: 2em;
@@ -53,14 +99,24 @@
 
 #searchBar {
 
-    margin-top: 20px;
-    position: absolute;
-    left: 50%;
-    -ms-transform: translate(-50%, 0%);
-    transform: translate(-50%, 0%);
-    
+    border-radius: 15px;
 }
 
-a {
+#getStarted {
+    
+    color:white;
+    width: 100px;
+    border-radius: 15px;
+    border: 2px solid black;
+    padding: 20px;
+    margin: 10px;
     text-decoration: none;
+    background-color: black;
+
+}
+
+#getStarted:hover {
+
+    font-size: 1.05em;
+    opacity: 85%;
 }

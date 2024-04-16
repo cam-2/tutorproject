@@ -317,7 +317,9 @@ app.post("/search", async (req,res) => {
     }
 
     else {
-      tutors = await db.any(`SELECT * FROM tutors INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id WHERE subjects.subject_name ILIKE $1`, [req.body.search])
+      tutors = await db.any(`SELECT * FROM tutors INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id 
+      INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id WHERE subjects.subject_name ILIKE $1`, 
+      [req.body.search]);
       if(tutors) {
 
         const tutorData = tutors.map(tutor => ({
