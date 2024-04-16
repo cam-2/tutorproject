@@ -1,8 +1,8 @@
 {{>message}}
-<div class="container mt-5">
-    <div class="row">
+<div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
         {{#each tutors}}
-        <div class="col-md-2 mb-4">
+        <div class="carousel-item {{#if @first}}active{{/if}}">
             <div class="card">
                 <img class="card-img-top"
                     src="https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png"
@@ -10,11 +10,76 @@
                 <div class="card-body">
                     <h5 class="card-title">{{firstName}} {{lastName}}</h5>
                     <p class="card-text">Email: {{email}}</p>
-                    <a href="/about/{{id}}" class = "btn btn-primary">View Tutor</a>
+                    <a href="/about/{{id}}" class="btn btn-primary">View Tutor</a>
                     <a href="/tutorProfile/{{id}}" class="btn btn-secondary">View Rating</a>
                 </div>
             </div>
         </div>
         {{/each}}
     </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
 </div>
+
+<style>
+    #carouselExampleControls {
+        padding-top: 6em;
+    }
+
+    .carousel-inner {
+        padding: 1em;
+    }
+
+    .card {
+        margin: 0 0.5em;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        background-color: #000000;
+        width: 6vh;
+        height: 6vh;
+        border-radius: 100%;
+        top: 48%;
+        margin-right: 2%;
+        margin-left: 2%;
+    }
+
+    .carousel-item {
+        margin-right: 0;
+        flex: 0 0 25%;
+        display: block;
+    }
+
+    .carousel-inner {
+        display: flex;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let carouselWidth = document.querySelector(".carousel-inner").scrollWidth;
+        let cardWidth = document.querySelector(".carousel-item").offsetWidth;
+        let scrollPosition = 0;
+
+        document.querySelector(".carousel-control-next").addEventListener("click", function () {
+            if (scrollPosition < carouselWidth - cardWidth * 5) {
+                scrollPosition += cardWidth;
+                document.querySelector(".carousel-inner").scroll({ left: scrollPosition, behavior: 'smooth' });
+            }
+        });
+
+        document.querySelector(".carousel-control-prev").addEventListener("click", function () {
+            if (scrollPosition > 0) {
+                scrollPosition -= cardWidth;
+                document.querySelector(".carousel-inner").scroll({ left: scrollPosition, behavior: 'smooth' });
+            }
+        });
+    });
+</script>
