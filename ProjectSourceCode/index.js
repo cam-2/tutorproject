@@ -35,7 +35,7 @@ const prodDBConfig = {
   password: process.env.password
 };
 
-const db = pgp(dbConfig);
+const db = pgp(prodDBConfig);
 // test your database
 db.connect()
   .then(obj => {
