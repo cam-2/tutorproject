@@ -1,7 +1,7 @@
 {{> message}}
 <body>
 <center>
-    <div style = "margin-top: 10%;">
+    <div style="margin-top: 10%;">
         <font size="5">
             <b>
                 Please enter the following information for storage in our database for better matching.
@@ -36,6 +36,19 @@
             <input name="email"></input>
         </div>
 
+        <div>
+            <label for='topic'>
+                <b>Topic:</b>
+            </label>
+        </div>
+        <div>
+            <select name="topic">
+                <option value="Math">Math</option>
+                <option value="Physics">Physics</option>
+                <option value="History">History</option>
+                <!--etc...-->
+            </select>
+        </div>
 
         <div>
             <Button type='submit' class='btn btn-primary'>Submit</Button>
