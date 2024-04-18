@@ -160,8 +160,15 @@ app.get('/about/:name', async (req, res) => {
       WHERE tutors.id = $1
       GROUP BY tutors.id
     `, [req.params.name]);
+    const subjectsTutored = await db.any(`
+      SELECT subjects.* as subTutored
+      FROM subjects
+      INNER JOIN tutor_subjects ON subjects.subject_id = tutor_subjects.subject_id
+      WHERE tutor_subjects.tutor_id = $1
+    `, [req.params.name]);
+
     // render page with given tutor
-    res.render('./pages/about.hbs', { tutor: tutorDetails });
+    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored});
   } catch (error) {
     // err handling 
     console.log('Error loading about', error);
@@ -417,18 +424,16 @@ app.post('/registerInfoTutor', async (req, res) => {
           console.log('Success: User modified - tutors table.');
 
           // Insert new entries for selected subjects into tutor_subjects table using SQL join
-          console.log("Test")
-          //if (subjects && subjects.length > 0) {
-              const insertQuery = `
-                INSERT INTO tutor_subjects (subject_id, tutor_id)
-                SELECT s.subject_id, $1 AS tutor_id
-                FROM subjects s
-                WHERE s.subject_name IN ($2:csv)
-              `;
-              console.log("Got here");
-              await t.none(insertQuery, [tutorId, topics]);
-              console.log('Success: Updated tutor_subjects table with new subjects');
-          //}
+          //console.log("Test")
+          const insertQuery = `
+            INSERT INTO tutor_subjects (subject_id, tutor_id)
+            SELECT s.subject_id, $1 AS tutor_id
+            FROM subjects s
+            WHERE s.subject_name IN ($2:csv)
+          `;
+          await t.none(insertQuery, [tutorId, topics]);
+          console.log('Success: Updated tutor_subjects table with new subjects');
+
       });
 
       req.session.destroy(); // log out and redirect to log in
