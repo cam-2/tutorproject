@@ -404,26 +404,42 @@ app.use(auth);
 
 
 app.post('/registerInfoTutor', async (req, res) => {
-
-
   console.log('req.body: ', req.body);
   console.log('req.session.user.id: ', req.session.user.id);
 
-  //can add more
-  const updateQuery = 'UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = ' + req.session.user.id; //Should work? need to test
-  const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
-  // Execute the query
-  let response = await db.any(updateQuery, updateValues);
-  if (response.err) {
-    console.log('Error: Could not update - tutors table.');
-    res.get('/register');
-  }
-  else {
-    console.log('Success: User modified - tutors table.');
-    req.session.destroy(); //logs out and redirects them to officially log in.
-    res.redirect('/loginTutor');
+  const { first_name, last_name, email, topics } = req.body;
+  const tutorId = req.session.user.id;
+
+  try {
+      await db.tx(async t => {
+          // Update tutors table
+          await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = $4', [first_name, last_name, email, tutorId]);
+          console.log('Success: User modified - tutors table.');
+
+          // Insert new entries for selected subjects into tutor_subjects table using SQL join
+          console.log("Test")
+          //if (subjects && subjects.length > 0) {
+              const insertQuery = `
+                INSERT INTO tutor_subjects (subject_id, tutor_id)
+                SELECT s.subject_id, $1 AS tutor_id
+                FROM subjects s
+                WHERE s.subject_name IN ($2:csv)
+              `;
+              console.log("Got here");
+              await t.none(insertQuery, [tutorId, topics]);
+              console.log('Success: Updated tutor_subjects table with new subjects');
+          //}
+      });
+
+      req.session.destroy(); // log out and redirect to log in
+      res.redirect('/loginTutor');
+  } catch (error) {
+      console.error('Error:', error.message);
+      res.redirect('/register'); // redirect back to registration page in case of error
   }
 });
+
+
 
 app.post('/registerInfoStudent', async (req, res) => {
 
@@ -432,7 +448,7 @@ app.post('/registerInfoStudent', async (req, res) => {
   console.log('req.session.user.id: ', req.session.user.id);
 
   //can add more
-  const updateQuery = 'UPDATE students SET first_name = $1, last_name = $2, email = $3 WHERE id = ' + req.session.user.id; //Should work? need to test
+  const updateQuery = 'UPDATE students SET first_name = $1, last_name = $2, email = $3 WHERE id = ' + req.session.user.id; 
   const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
   // Execute the query
   let response = await db.any(updateQuery, updateValues);
