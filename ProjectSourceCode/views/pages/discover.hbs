@@ -9,9 +9,14 @@
                     alt="{{firstName}} {{lastName}}'s picture">
                 <div class="card-body">
                     <h5 class="card-title">{{firstName}} {{lastName}}</h5>
-                    <p class="card-text">Email: {{email}}</p>
+                    <p class="card-text">
+                        {{#if averageRating}}
+                        Rating: {{averageRating}}
+                        {{else}}
+                        No ratings yet!
+                        {{/if}}
+                    </p>
                     <a href="/about/{{id}}" class="btn btn-primary">View Tutor</a>
-                    <a href="/tutorProfile/{{id}}" class="btn btn-secondary">View Rating</a>
                 </div>
             </div>
         </div>
