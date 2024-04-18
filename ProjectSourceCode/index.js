@@ -407,7 +407,7 @@ app.post('/registerInfoTutor', async (req, res) => {
   console.log('req.body: ', req.body);
   console.log('req.session.user.id: ', req.session.user.id);
 
-  const { first_name, last_name, email, subjects } = req.body;
+  const { first_name, last_name, email, topics } = req.body;
   const tutorId = req.session.user.id;
 
   try {
@@ -423,11 +423,11 @@ app.post('/registerInfoTutor', async (req, res) => {
                 INSERT INTO tutor_subjects (subject_id, tutor_id)
                 SELECT s.subject_id, $1 AS tutor_id
                 FROM subjects s
-                WHERE s.subject_name IN ($2:csv);
+                WHERE s.subject_name IN ($2:csv)
               `;
               console.log("Got here");
-              await t.none(insertQuery, [tutorId, subjects]);
-              console.log('Success: Updated tutor_subjects table with new subjects:', subjects);
+              await t.none(insertQuery, [tutorId, topics]);
+              console.log('Success: Updated tutor_subjects table with new subjects');
           //}
       });
 
