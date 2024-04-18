@@ -69,8 +69,8 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    // console.log("Calling here!");
-    res.redirect('/landing'); 
+  // console.log("Calling here!");
+  res.redirect('/landing');
 });
 
 app.get('/loginStudent', (req, res) => {
@@ -86,14 +86,20 @@ app.get('/landing', (req, res) => {
 
 app.get('/discover', async (req, res) => {
   try {
-    const tutors = await db.any('SELECT * FROM tutors;');
+    const tutors = await db.any(`
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+      FROM tutors
+      LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      GROUP BY tutors.id
+      ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
+    `);
 
     const tutorData = tutors.map(tutor => ({
       id: tutor.id,
       username: tutor.username,
       firstName: tutor.first_name,
       lastName: tutor.last_name,
-      email: tutor.email
+      averageRating: tutor.average_rating
     }));
 
     res.render('pages/discover', { tutors: tutorData });
@@ -103,50 +109,56 @@ app.get('/discover', async (req, res) => {
   }
 });
 
-// function used for getting the average rating of a tutor
-async function getTutorAverageRating(tutorId) {
-  try {
-    // get avg rating from ratings table for the tutor  
-    const result = await db.oneOrNone('SELECT AVG(rating) as average_rating FROM ratings WHERE tutor_id = $1', [tutorId]);  
-    // check if the result and avg are not empty
-    if (result && result.average_rating) return parseFloat(result.average_rating).toFixed(2); // ensures 2 decimal places
-    else return 'No ratings yet';
-  } catch (error) {
-    // err handling
-    console.log('Error getting rating:', error);
-    throw error;
-  }
-}
-// new route that shows the tutor rating on a seperate page because i couldnt get it to work on the discover page, gonna try to get it to work on the discover page soon
-app.get('/tutorProfile/:tutorId', async (req, res) => {
-  const tutorId = req.params.tutorId;
-  try {
-    // get tutor with a id from the params
-    const tutorDetails = await db.one('SELECT * FROM tutors WHERE id = $1', [tutorId]);
-    // calc avg rating for a tutor
-    const averageRating = await getTutorAverageRating(tutorId);
-    // render page with given tutor and rating
-    res.render('./pages/tutorProfile.hbs', { tutor: tutorDetails, averageRating: averageRating });
-  } catch (error) {
-    // err handling 
-    console.log('Error in tutorProfile:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
+// // function used for getting the average rating of a tutor
+// async function getTutorAverageRating(tutorId) {
+//   try {
+//     // get avg rating from ratings table for the tutor  
+//     const result = await db.oneOrNone('SELECT AVG(rating) as average_rating FROM ratings WHERE tutor_id = $1', [tutorId]);
+//     // check if the result and avg are not empty
+//     if (result && result.average_rating) return parseFloat(result.average_rating).toFixed(2); // ensures 2 decimal places
+//     else return 'No ratings yet';
+//   } catch (error) {
+//     // err handling
+//     console.log('Error getting rating:', error);
+//     throw error;
+//   }
+// }
+// // new route that shows the tutor rating on a seperate page because i couldnt get it to work on the discover page, gonna try to get it to work on the discover page soon
+// app.get('/tutorProfile/:tutorId', async (req, res) => {
+//   const tutorId = req.params.tutorId;
+//   try {
+//     // get tutor with a id from the params
+//     const tutorDetails = await db.one('SELECT * FROM tutors WHERE id = $1', [tutorId]);
+//     // calc avg rating for a tutor
+//     const averageRating = await getTutorAverageRating(tutorId);
+//     // render page with given tutor and rating
+//     res.render('./pages/tutorProfile.hbs', { tutor: tutorDetails, averageRating: averageRating });
+//   } catch (error) {
+//     // err handling 
+//     console.log('Error in tutorProfile:', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// });
 
 
 app.get('/about/:name', async (req, res) => {
 
-try {
-  // get tutor with a id from the params
-  const tutorDetails = await db.one('SELECT * FROM tutors WHERE id = $1', [req.params.name]);
-  // render page with given tutor
-  res.render('./pages/about.hbs', { tutor: tutorDetails});
-} catch (error) {
-  // err handling 
-  console.log('Error loading about', error);
-  res.status(500).send('Internal Server Error');
-}
+  try {
+    // get tutor with a id from the params
+    const tutorDetails = await db.one(`
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+      FROM tutors
+      LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      WHERE tutors.id = $1
+      GROUP BY tutors.id
+    `, [req.params.name]);
+    // render page with given tutor
+    res.render('./pages/about.hbs', { tutor: tutorDetails });
+  } catch (error) {
+    // err handling 
+    console.log('Error loading about', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 app.get('/profile', (req, res) => {
@@ -234,8 +246,8 @@ app.post('/loginTutor', async (req, res) => {
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.render('pages/logout', {
-      message: "Was able to logout successfully!",
-  }); 
+    message: "Was able to logout successfully!",
+  });
 });
 
 
@@ -247,24 +259,24 @@ app.post('/register', async (req, res) => {
   console.log('req.body: ', req.body);
   const hash = await bcrypt.hash(req.body.password, 10);
 
-  if(req.body.tutor_student_rad == "tutor"){
+  if (req.body.tutor_student_rad == "tutor") {
     //The preemption logic makes sure that we don't try to make a INSERT query if the user already exists
     const preemptQuery = 'SELECT id FROM tutors WHERE username = $1';
     const preemptValue = [req.body.username];
     let preemptResponse = await db.any(preemptQuery, preemptValue);
-    if(preemptResponse.length != 0){//if we didn't recieve an error, that means the value already exists (bad)
+    if (preemptResponse.length != 0) {//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This tutor already exists; cannot register.');
       res.render('pages/loginTutor', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
     }
-    else{
+    else {
       const insertQuery = 'INSERT INTO tutors (username, password) VALUES ($1, $2)';
       const insertValues = [req.body.username, hash];
       // Execute the query
       let response = await db.any(insertQuery, insertValues);
-      if(response.err) {
+      if (response.err) {
         console.log('Error: Could not insert into db - tutors table.');
         res.get('/register');
       }
@@ -277,24 +289,24 @@ app.post('/register', async (req, res) => {
       }
     }
   }
-  else{
+  else {
     //The preemption logic makes sure that we don't try to make a INSERT query if the user already exists
     const preemptQuery = 'SELECT id FROM students WHERE username = $1';
     const preemptValue = [req.body.username];
     let preemptResponse = await db.any(preemptQuery, preemptValue);
-    if(preemptResponse.length != 0){//if we didn't recieve an error, that means the value already exists (bad)
+    if (preemptResponse.length != 0) {//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This student already exists; cannot register.');
       res.redirect('pages/loginStudent', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
     }
-    else{
+    else {
       const insertQuery = 'INSERT INTO students (username, password) VALUES ($1, $2)';
       const insertValues = [req.body.username, hash];
       // Execute the query
       let response = await db.any(insertQuery, insertValues);
-      if(response.err) {
+      if (response.err) {
         console.log('Error: Could not insert into db - students table.');
         res.get('/register');
       }
@@ -309,47 +321,61 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.post("/search", async (req,res) => {
+app.post("/search", async (req, res) => {
 
   try {
 
-    var tutors = await db.any(`SELECT * FROM tutors WHERE first_name ILIKE $1 OR last_name ILIKE $1`, [req.body.search]);
-    if(tutors.length != 0) {
+    var tutors = await db.any(`
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+      FROM tutors
+      LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      WHERE first_name ILIKE $1 OR last_name ILIKE $1
+      GROUP BY tutors.id
+      ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
+    `, [req.body.search]);
+    if (tutors.length != 0) {
       const tutorData = tutors.map(tutor => ({
         id: tutor.id,
         username: tutor.username,
         firstName: tutor.first_name,
         lastName: tutor.last_name,
-        email: tutor.email
+        averageRating: tutor.average_rating
       }));
 
       res.render('pages/discover', { tutors: tutorData });
     }
 
     else {
-      tutors = await db.any(`SELECT * FROM tutors INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id 
-      INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id WHERE subjects.subject_name ILIKE $1`, 
-      [req.body.search]);
-      if(tutors) {
+      tutors = await db.any(`
+        SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+        FROM tutors
+        INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id 
+        INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
+        LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+        WHERE subjects.subject_name ILIKE $1
+        GROUP BY tutors.id
+        ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
+      `, [req.body.search]);
+      if (tutors) {
 
         const tutorData = tutors.map(tutor => ({
           id: tutor.id,
           username: tutor.username,
           firstName: tutor.first_name,
           lastName: tutor.last_name,
-          email: tutor.email
+          averageRating: tutor.average_rating
         }));
 
         res.render('pages/discover', { tutors: tutorData });
-      } 
+      }
 
       else {
         error = true;
-        res.redirect('/discover', {tutors: [], message: "No matching results found."});
+        res.redirect('/discover', { tutors: [], message: "No matching results found." });
       }
     }
   }
-  catch(error) {
+  catch (error) {
 
     console.error(error);
     res.render('pages/discover', { tutors: [], message: 'An error occurred while fetching tutors.', error: true });
@@ -370,8 +396,8 @@ app.use(auth);
 
 
 app.post('/registerInfoTutor', async (req, res) => {
-  
-  
+
+
   console.log('req.body: ', req.body);
   console.log('req.session.user.id: ', req.session.user.id);
 
@@ -380,7 +406,7 @@ app.post('/registerInfoTutor', async (req, res) => {
   const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
   // Execute the query
   let response = await db.any(updateQuery, updateValues);
-  if(response.err) {
+  if (response.err) {
     console.log('Error: Could not update - tutors table.');
     res.get('/register');
   }
@@ -392,8 +418,8 @@ app.post('/registerInfoTutor', async (req, res) => {
 });
 
 app.post('/registerInfoStudent', async (req, res) => {
-  
-  
+
+
   console.log('req.body: ', req.body);
   console.log('req.session.user.id: ', req.session.user.id);
 
@@ -402,7 +428,7 @@ app.post('/registerInfoStudent', async (req, res) => {
   const updateValues = [req.body.first_name, req.body.last_name, req.body.email];
   // Execute the query
   let response = await db.any(updateQuery, updateValues);
-  if(response.err) {
+  if (response.err) {
     console.log('Error: Could not update - student table.');
     res.get('/register');
   }
