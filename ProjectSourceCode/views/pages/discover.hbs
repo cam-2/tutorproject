@@ -9,14 +9,17 @@
                     alt="{{firstName}} {{lastName}}'s picture">
                 <div class="card-body">
                     <h5 class="card-title">{{firstName}} {{lastName}}</h5>
-                    <p class="card-text">
-                        {{#if averageRating}}
-                        Rating: {{averageRating}}
-                        {{else}}
-                        No ratings yet!
-                        {{/if}}
-                    </p>
-                    <a href="/about/{{id}}" class="btn btn-primary">View Tutor</a>
+                    <p class="card-text">{{#each subjects}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>
+                    <div class="button-rating-container">
+                        <a href="/about/{{id}}" class="btn btn-primary">View Tutor</a>
+                        <p class="rating-text">
+                            {{#if averageRating}}
+                            Rating: {{averageRating}}
+                            {{else}}
+                            No ratings yet!
+                            {{/if}}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,6 +36,12 @@
 </div>
 
 <style>
+    .button-rating-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     #carouselExampleControls {
         margin-top: 6em;
     }

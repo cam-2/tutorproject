@@ -95,9 +95,11 @@ app.get('/landing', (req, res) => {
 app.get('/discover', async (req, res) => {
   try {
     const tutors = await db.any(`
-      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
       FROM tutors
       LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      LEFT JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id
+      LEFT JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
       GROUP BY tutors.id
       ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
     `);
@@ -107,7 +109,8 @@ app.get('/discover', async (req, res) => {
       username: tutor.username,
       firstName: tutor.first_name,
       lastName: tutor.last_name,
-      averageRating: tutor.average_rating
+      averageRating: tutor.average_rating,
+      subjects: tutor.subjects
     }));
 
     res.render('pages/discover', { tutors: tutorData });
@@ -341,9 +344,11 @@ app.post("/search", async (req, res) => {
   try {
 
     var tutors = await db.any(`
-      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
       FROM tutors
       LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      LEFT JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id
+      LEFT JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
       WHERE first_name ILIKE $1 OR last_name ILIKE $1
       GROUP BY tutors.id
       ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
@@ -354,7 +359,8 @@ app.post("/search", async (req, res) => {
         username: tutor.username,
         firstName: tutor.first_name,
         lastName: tutor.last_name,
-        averageRating: tutor.average_rating
+        averageRating: tutor.average_rating,
+        subjects: tutor.subjects
       }));
 
       res.render('pages/discover', { tutors: tutorData });
@@ -362,7 +368,7 @@ app.post("/search", async (req, res) => {
 
     else {
       tutors = await db.any(`
-        SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+        SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
         FROM tutors
         INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id 
         INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
@@ -378,7 +384,8 @@ app.post("/search", async (req, res) => {
           username: tutor.username,
           firstName: tutor.first_name,
           lastName: tutor.last_name,
-          averageRating: tutor.average_rating
+          averageRating: tutor.average_rating,
+          subjects: tutor.subjects
         }));
 
         res.render('pages/discover', { tutors: tutorData });
