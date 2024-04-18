@@ -160,8 +160,15 @@ app.get('/about/:name', async (req, res) => {
       WHERE tutors.id = $1
       GROUP BY tutors.id
     `, [req.params.name]);
+    const subjectsTutored = await db.any(`
+      SELECT subjects.* as subTutored
+      FROM subjects
+      INNER JOIN tutor_subjects ON subjects.subject_id = tutor_subjects.subject_id
+      WHERE tutor_subjects.tutor_id = $1
+    `, [req.params.name]);
+
     // render page with given tutor
-    res.render('./pages/about.hbs', { tutor: tutorDetails });
+    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored});
   } catch (error) {
     // err handling 
     console.log('Error loading about', error);
