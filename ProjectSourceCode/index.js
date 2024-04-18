@@ -35,7 +35,7 @@ const prodDBConfig = {
   password: process.env.password
 };
 
-const db = pgp(prodDBConfig);
+const db = pgp(dbConfig);
 // test your database
 db.connect()
   .then(obj => {
@@ -169,6 +169,9 @@ app.get('/registerInfoStudent', (req, res) => {
 });
 app.get('/registerInfoTutor', (req, res) => {
   res.render('./pages/registerInfoTutor.hbs');
+});
+app.get('/calendar', (req, res) => {
+  res.render('./pages/calendar.hbs');
 });
 
 app.post('/loginStudent', async (req, res) => {
@@ -417,6 +420,26 @@ app.post('/registerInfoStudent', async (req, res) => {
   else {
     console.log('Success: User modified - students table.');
     res.redirect('/loginStudent');
+  }
+});
+
+app.post('/calendar', async (req, res) => {
+
+  console.log('req.body: ', req.body);
+  console.log('req.session.user.id: ', async(req.session.user.id));
+
+  const addAvailQuery = 'INSERT INTO availabilities (subject, start_time, end_time, fk_tutor_id) VALUES ($1,$2,$3,$4)';
+  const availVals = ['CHEM', '2024-04-18 13:30:00 -6:00', '2024-04-18 14:30:00 -6:00', 1];
+
+  let response = await db.any(addAvailQuery, availVals);
+
+  if(response.err) {
+    console.log('Error: Could not insert into db - availability table.');
+    res.get('/calendar');
+  }
+  else {
+    console.log('Success: User added to db - availability table.');
+    res.redirect('/calendar');
   }
 });
 
