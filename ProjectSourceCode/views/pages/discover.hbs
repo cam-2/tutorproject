@@ -8,17 +8,17 @@
                     src="https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png"
                     alt="{{firstName}} {{lastName}}'s picture">
                 <div class="card-body">
-                    <h5 class="card-title">{{firstName}} {{lastName}}</h5>
+                    <h3 class="card-title">{{firstName}} {{lastName}}</h3>
                     <p class="card-text">{{#each subjects}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>
                     <div class="button-rating-container">
                         <a href="/about/{{id}}" class="btn btn-primary">View Tutor</a>
-                        <p class="rating-text">
+                        <h4 class="rating-text">
                             {{#if averageRating}}
                             Rating: {{averageRating}}
                             {{else}}
                             No ratings yet!
                             {{/if}}
-                        </p>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -52,6 +52,27 @@
 
     .card {
         margin: 0 0.5em;
+        border: none;
+        box-shadow: 2px 6px 8px 0 rgba(20, 20, 24, 0.2);
+        font-family: Arial, Helvetica, sans-serif
+    }
+
+    .btn {
+        color: white;
+        width: 150px;
+        border-radius: 15px;
+        border: 2px solid black;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        margin-top: 10px;
+        text-decoration: none;
+        background-color: black;
+    }
+
+    .btn:hover {
+        background-color: black;
+        border: 2px solid black;
+        opacity: 80%;
     }
 
     .carousel-control-prev,
@@ -60,7 +81,8 @@
         width: 6vh;
         height: 6vh;
         border-radius: 100%;
-        top: 40%;
+        top: 50%;
+        transform: translateY(-100%);
         margin-right: 2%;
         margin-left: 2%;
     }
