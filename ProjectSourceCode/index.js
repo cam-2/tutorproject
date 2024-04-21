@@ -10,22 +10,54 @@ const bcrypt = require('bcrypt'); //  To hash passwords
 const { name } = require('body-parser');
 const json = require('body-parser/lib/types/json');
 const { error } = require('console');
+const { Router } = require('express');
+const multer  = require('multer');
+const sharp = require('sharp');
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/img/users');
+  },
+  filename : (req, file, cb) => {
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `user-${req.session.user.id}-${Date.now()}.${ext}`);
+  }
+});
+
+const multerFilter = (req, file, cb) => {
+  if(file.mimetype.startsWith('image')) {
+    cb(null, true);
+  }
+  else {
+    cb(new Error("Please upload an image.", 400), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  fileFilter: multerFilter
+});
+
+exports.uploadUserPhoto = upload.single('uploaded_file');
+
+// exports.resizeUserPhoto = async (req, res, next) => {
+//   if (!req.file) return next();
+
+//   req.file.filename = `user-${req.session.user.id}-${Date.now()}.jpeg`;
+
+//   await sharp(req.file.buffer)
+//     .resize(500, 500)
+//     .toFormat('jpeg')
+//     .toFile(`public/img/users/${req.file.filename}`);
+
+//   next();
+// };
 
 const hbs = handlebars.create({
   extname: 'hbs',
   layoutsDir: __dirname + '/views/layouts', //not used rn
   partialsDir: __dirname + '/views/partials', //not used rn
 });
-
-// database configuration
-const dbConfig = {
-  host: 'db', // the database server
-  port: 5432, // the database port
-  database: process.env.POSTGRES_DB, // the database name
-  user: process.env.POSTGRES_USER, // the user account to connect with
-  password: process.env.POSTGRES_PASSWORD, // the password of the user account
-};
 
 const broaddbConfig = {
   host: process.env.host, // the database server
@@ -46,15 +78,11 @@ db.connect()
     console.log('ERROR:', error.message || error);
   });
 
-
-
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
-
-
 
 app.use(
   session({
@@ -216,7 +244,7 @@ app.post('/loginTutor', async (req, res) => {
         // Save user details in the session
         req.session.user = user;
         req.session.save();
-        res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
+        res.redirect('/discover'); //or whatever landing page? Calendar maybe?
       } else {
         // Incorrect password
         res.render('pages/loginTutor', {
@@ -425,12 +453,15 @@ app.post("/search", async (req, res) => {
 
 
 
-app.post('/registerInfoTutor', async (req, res) => {
+app.post('/registerInfoTutor', upload.single('uploaded_file'), async (req, res) => {
   console.log('req.body: ', req.body);
   console.log('req.session.user.id: ', req.session.user.id);
+  console.log('req.file: ', req.file);
 
   const { first_name, last_name, email, topics } = req.body;
   const tutorId = req.session.user.id;
+
+  exports.uploadUserPhoto = req.body.file;
 
   try {
       await db.tx(async t => {
