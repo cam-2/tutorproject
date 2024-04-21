@@ -82,7 +82,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/loginStudent', (req, res) => {
-  res.render('./pages/loginStudent.hbs');
+  const message = req.query.message || ''; // Extract the message from query params
+  const error = req.query.error === 'true'; // Check if error flag is true
+  res.render('./pages/loginStudent.hbs', { message, error });
 });
 app.get('/loginTutor', (req, res) => {
   res.render('./pages/loginTutor.hbs');
@@ -92,33 +94,7 @@ app.get('/landing', (req, res) => {
   res.render('./pages/landingPage.hbs');
 });
 
-app.get('/discover', async (req, res) => {
-  try {
-    const tutors = await db.any(`
-      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
-      FROM tutors
-      LEFT JOIN ratings ON tutors.id = ratings.tutor_id
-      LEFT JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id
-      LEFT JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
-      GROUP BY tutors.id
-      ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
-    `);
 
-    const tutorData = tutors.map(tutor => ({
-      id: tutor.id,
-      username: tutor.username,
-      firstName: tutor.first_name,
-      lastName: tutor.last_name,
-      averageRating: tutor.average_rating,
-      subjects: tutor.subjects
-    }));
-
-    res.render('pages/discover', { tutors: tutorData });
-  } catch (error) {
-    console.error(error);
-    res.render('pages/discover', { tutors: [], message: 'An error occurred while fetching tutors.', error: true });
-  }
-});
 
 // // function used for getting the average rating of a tutor
 // async function getTutorAverageRating(tutorId) {
@@ -179,9 +155,6 @@ app.get('/about/:name', async (req, res) => {
   }
 });
 
-app.get('/profile', (req, res) => {
-  res.render('./pages/profile.hbs');
-});
 
 app.get('/register', (req, res) => {
   res.render('./pages/register.hbs');
@@ -339,6 +312,50 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Authentication Middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/loginStudent?error=true&message=Please log in to continue.');
+  }
+  next();
+};
+
+app.use(auth);
+
+app.get('/profile', (req, res) => {
+  res.render('./pages/profile.hbs');
+});
+
+
+app.get('/discover', async (req, res) => {
+  try {
+    const tutors = await db.any(`
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
+      FROM tutors
+      LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      LEFT JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id
+      LEFT JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
+      GROUP BY tutors.id
+      ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
+    `);
+
+    const tutorData = tutors.map(tutor => ({
+      id: tutor.id,
+      username: tutor.username,
+      firstName: tutor.first_name,
+      lastName: tutor.last_name,
+      averageRating: tutor.average_rating,
+      subjects: tutor.subjects
+    }));
+
+    res.render('pages/discover', { tutors: tutorData });
+  } catch (error) {
+    console.error(error);
+    res.render('pages/discover', { tutors: [], message: 'An error occurred while fetching tutors.', error: true });
+  }
+});
+
 app.post("/search", async (req, res) => {
 
   try {
@@ -404,17 +421,6 @@ app.post("/search", async (req, res) => {
   }
 });
 
-
-// Authentication Middleware.
-const auth = (req, res, next) => {
-  if (!req.session.user) {
-    // Default to login page.
-    return res.redirect('/login');
-  }
-  next();
-};
-
-app.use(auth);
 
 
 app.post('/registerInfoTutor', async (req, res) => {
