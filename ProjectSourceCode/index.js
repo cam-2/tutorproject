@@ -16,7 +16,7 @@ const sharp = require('sharp');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/img/users');
+    cb(null, 'public/img');
   },
   filename : (req, file, cb) => {
     const ext = file.mimetype.split('/')[1];
@@ -40,18 +40,18 @@ const upload = multer({
 
 exports.uploadUserPhoto = upload.single('uploaded_file');
 
-// exports.resizeUserPhoto = async (req, res, next) => {
-//   if (!req.file) return next();
+exports.resizeUserPhoto = async (req, res, next) => {
+  if (!req.file) return next();
 
-//   req.file.filename = `user-${req.session.user.id}-${Date.now()}.jpeg`;
+  req.file.filename = `user-${req.session.user.id}-${Date.now()}.jpeg`;
 
-//   await sharp(req.file.buffer)
-//     .resize(500, 500)
-//     .toFormat('jpeg')
-//     .toFile(`public/img/users/${req.file.filename}`);
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .toFile(`public/img/${req.file.filename}`);
 
-//   next();
-// };
+  next();
+};
 
 const hbs = handlebars.create({
   extname: 'hbs',
@@ -457,16 +457,16 @@ app.post('/registerInfoTutor', upload.single('uploaded_file'), async (req, res) 
   console.log('req.body: ', req.body);
   console.log('req.session.user.id: ', req.session.user.id);
   console.log('req.file: ', req.file);
+  console.log('filename: ', req.file.filename);
 
   const { first_name, last_name, email, topics } = req.body;
   const tutorId = req.session.user.id;
-
-  exports.uploadUserPhoto = req.body.file;
+  const filename = req.file.filename;
 
   try {
       await db.tx(async t => {
           // Update tutors table
-          await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = $4', [first_name, last_name, email, tutorId]);
+          await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3, img_url = $4 WHERE id = $5', [first_name, last_name, email, filename, tutorId]);
           console.log('Success: User modified - tutors table.');
 
           // Insert new entries for selected subjects into tutor_subjects table using SQL join
