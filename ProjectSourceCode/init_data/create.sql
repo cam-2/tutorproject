@@ -20,7 +20,7 @@ CREATE TABLE tutors (
     last_name VARCHAR(40),
     email VARCHAR(100),
     about VARCHAR(500),
-    imgURL VARCHAR(200),
+    img_url VARCHAR(200),
     password VARCHAR(200) NOT NULL
     -- fk_avail_id INT REFERENCES availabilities(id)
 );
