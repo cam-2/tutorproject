@@ -69,7 +69,7 @@ app.use(
     extended: true,
   })
 );
-
+ 
 app.use(express.static(__dirname + '/public'));
 
 app.get('/welcome', (req, res) => {
@@ -96,7 +96,7 @@ app.get('/landing', (req, res) => {
 
 
 
-// // function used for getting the average rating of a tutor
+// // function used for getting the average rating of a tutor --deprecated
 // async function getTutorAverageRating(tutorId) {
 //   try {
 //     // get avg rating from ratings table for the tutor  
@@ -111,6 +111,7 @@ app.get('/landing', (req, res) => {
 //   }
 // }
 // // new route that shows the tutor rating on a seperate page because i couldnt get it to work on the discover page, gonna try to get it to work on the discover page soon
+//  --deprecated
 // app.get('/tutorProfile/:tutorId', async (req, res) => {
 //   const tutorId = req.params.tutorId;
 //   try {
@@ -145,9 +146,10 @@ app.get('/about/:name', async (req, res) => {
       INNER JOIN tutor_subjects ON subjects.subject_id = tutor_subjects.subject_id
       WHERE tutor_subjects.tutor_id = $1
     `, [req.params.name]);
-
+    const tutorsPosts = await db.any(`SELECT * FROM posts WHERE posts.fk_tutor_id = $1`, [req.params.name]); // used for getting the posts of the tutor
+    // console.log('tutorPosts:', tutorsPosts); // used for debug
     // render page with given tutor
-    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored});
+    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored, posts: tutorsPosts});
   } catch (error) {
     // err handling 
     console.log('Error loading about', error);

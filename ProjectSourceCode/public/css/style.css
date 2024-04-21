@@ -126,6 +126,69 @@
     opacity: 85%;
 }
 
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.aboutPage {
+    flex: 1; 
+    padding: 20px;
+    margin-left: -20px;
+    margin-right: 20px;
+    background-color: #f9f9f9;
+}
+
+.posts {
+    flex: 1; 
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    margin-top: 25px;
+    padding: 20px;
+}
+
+.post {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.post h4 {
+    margin: 0 0 10px 0;
+}
+
+.post p {
+    margin: 5px 0;
+}
+
+.averageRating, .subjects, .aboutText, .bookButton {
+    margin-bottom: 15px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #landing {
 
     margin-left: 20px;

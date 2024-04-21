@@ -70,6 +70,16 @@ CREATE TABLE availabilities (
     booked_bool BOOLEAN -- NULL or FALSE means it hasn't been booked yet, TRUE means the appointment has been reserved
 );
 
+DROP TABLE IF EXISTS posts;
+CREATE TABLE posts (
+    id SERIAL PRIMARY KEY NOT NULL,
+    title VARCHAR(35),
+    content VARCHAR(500),
+    fk_tutor_id INT REFERENCES tutors(id) NOT NULL,
+    post_date TIMESTAMP,
+    likes INT
+);
+
 -- DROP TABLE IF EXISTS tutor_to_student;
 -- CREATE TABLE tutor_to_student (
 --     id SERIAL PRIMARY KEY NOT NULL,
