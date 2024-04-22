@@ -1,12 +1,16 @@
-<nav class = "navbar">
-    <div class = "menu">
-        <a id = "landing" href = "/landing">Twuttor</a>
+<nav class="navbar">
+    <div class="menu">
+        <a id="landing" href="/landing">Twuttor</a>
     </div>
-    <form id = "searchBar" action = "/search" method = "POST"><input type = "text" placeholder = "Search" name = "search"></form>
-    <div class = "nav-right">
-        <a href = "/discover">Discover</a>
-        <a href = "/profile">Profile</a>
-        <a href = "/loginTutor">Tutor Log in</a>
-        <a href = "/loginStudent">Student Log in</a>
+    <form id="searchBar" action="/search" method="POST">
+        <input type="text" placeholder="Search" name="search">
+    </form>
+    <div class="nav-right">
+        <a href="/discover">Discover</a>
+        <a href="/profile">Profile</a>
+        <a href="/login">Login</a>
+        {{#if session}}
+            <a href="/logout">Logout</a>
+        {{/if}}
     </div>
 </nav>
