@@ -76,8 +76,8 @@
 
 .aboutPage {
 
-    margin-top:8%;
-    margin-left:10%;
+    margin-top: 8%;
+    margin-left: 5%;
 }
 
 .aboutPage h1 {
@@ -85,6 +85,19 @@
     font-weight: bolder;
     font-size: 4em;
     font-family: Arial, Helvetica, sans-serif
+}
+
+.aboutPage h5 {
+
+    opacity: 90%;
+    font-size: 1em;
+}
+
+.aboutPage img {
+
+    position: absolute;
+    left: 50%;
+    transform: translate(0%, -80%);
 }
 
 .aboutText {
@@ -127,44 +140,44 @@
 }
 
 .container {
-    display: flex;
+
+    display: flexbox;
     justify-content: space-between;
     padding: 20px;
 }
 
-.aboutPage {
-    flex: 1; 
-    padding: 20px;
-    margin-left: -20px;
-    margin-right: 20px;
-}
-
 .posts {
+    
+    position: absolute;
+    left: 50%;
+    transform: translate(-10%, 5%);
+    width: 40%;
     flex: 1; 
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
     margin-top: 25px;
-    padding: 20px;
+    padding: 5px;
+
 }
 
 .post {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    background-color: white;
+    
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    font-size: smaller;
 }
 
 .post h4 {
+    
     margin: 0 0 10px 0;
 }
 
 .post p {
+
     margin: 5px 0;
 }
 
 .averageRating, .subjects, .aboutText, .bookButton {
-    margin-bottom: 15px;
+
+    margin-bottom: 10px;
 }
 
 #landing {
