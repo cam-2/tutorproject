@@ -33,7 +33,14 @@
             <a href="">Book</a>
         </div>
 
-        <img src = "../img/{{tutor.img_url}}" alt = "{{tutor.first_name}}'s profile photo.">
+        <div id = "tutorimg">
+            {{#if tutor.img_url}}
+                <img src = "../img/{{tutor.img_url}}" alt = "{{tutor.first_name}}'s profile photo.">
+            {{else}}
+            <h4>{{tutor.first_name}} has not uploaded a profile photo.</h4>
+            {{/if}}
+        </div>
+
     </div>
 
     <div class= "container">

@@ -442,20 +442,28 @@ app.post("/search", async (req, res) => {
 
 
 app.post('/registerInfoTutor', upload.single('uploaded_file'), async (req, res) => {
-  console.log('req.body: ', req.body);
-  console.log('req.session.user.id: ', req.session.user.id);
-  console.log('req.file: ', req.file);
-  console.log('filename: ', req.file.filename);
 
   const { first_name, last_name, email, topics } = req.body;
   const tutorId = req.session.user.id;
-  const filename = req.file.filename;
 
   try {
+
       await db.tx(async t => {
-          // Update tutors table
-          await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3, img_url = $4 WHERE id = $5', [first_name, last_name, email, filename, tutorId]);
-          console.log('Success: User modified - tutors table.');
+
+          if(req.file) {
+
+            // Update tutors table if photo uploaded
+            const filename = req.file.filename;
+            await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3, img_url = $4 WHERE id = $5', [first_name, last_name, email, filename, tutorId]);
+            console.log('Success: User modified - tutors table.');
+          }
+
+          else {
+
+            // Update tutors table without photo uploaded
+            await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = $4', [first_name, last_name, email, tutorId]);
+            console.log('Success: User modified - tutors table.');
+          }
 
           // Insert new entries for selected subjects into tutor_subjects table using SQL join
           //console.log("Test")
