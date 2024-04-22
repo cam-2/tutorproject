@@ -76,8 +76,8 @@
 
 .aboutPage {
 
-    margin-top: 8%;
-    margin-left: 5%;
+    margin-top: 10%;
+    margin-left: 6%;
 }
 
 .aboutPage h1 {
@@ -93,29 +93,22 @@
     font-size: 1em;
 }
 
-.aboutPage img {
-
-    position: absolute;
-    left: 50%;
-    transform: translate(0%, -80%);
-}
-
 .aboutText {
 
     box-sizing: border-box;
-    width: 45%;
+    width: 35%;
 }
 
 .aboutText h4 {
 
     margin-top: 50px;
-    font-weight: 350;
+    font-weight: 300;
 }
 
 .bookButton {
 
     margin-top: 50px;
-    margin-left: 15%;
+    margin-left: 10%;
 }
 
 .bookButton a {
@@ -149,11 +142,10 @@
 .posts {
     
     position: absolute;
-    left: 50%;
+    left: 55%;
     transform: translate(-10%, 5%);
-    width: 40%;
     flex: 1; 
-    margin-top: 25px;
+    margin-top: 20px;
     padding: 5px;
 
 }
@@ -225,4 +217,19 @@
 
     font-size: 1.05em;
     opacity: 85%;
+}
+
+#tutorimg img{
+
+    position: absolute;
+    left: 55%;
+    transform: translate(0%, -80%);
+}
+
+#tutorimg {
+
+    width: 40%;
+    position: absolute;
+    left: 55%;
+    transform: translate(0%, -500%);
 }
