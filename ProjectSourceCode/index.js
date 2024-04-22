@@ -81,13 +81,10 @@ app.get('/', (req, res) => {
   res.redirect('/landing');
 });
 
-app.get('/loginStudent', (req, res) => {
+app.get('/login', (req, res) => {
   const message = req.query.message || ''; // Extract the message from query params
   const error = req.query.error === 'true'; // Check if error flag is true
-  res.render('./pages/loginStudent.hbs', { message, error });
-});
-app.get('/loginTutor', (req, res) => {
-  res.render('./pages/loginTutor.hbs');
+  res.render('./pages/login.hbs', { message, error });
 });
 
 app.get('/landing', (req, res) => {
@@ -166,80 +163,63 @@ app.get('/registerInfoTutor', (req, res) => {
   res.render('./pages/registerInfoTutor.hbs');
 });
 
-app.post('/loginStudent', async (req, res) => {
+app.post('/login', async (req, res) => {
+  if (!req.body.username || !req.body.password || !req.body.tutor_student_rad) {
+      return res.status(400).send('Missing required field');
+  }
 
-  // Find the user based on the entered username
+  const username = req.body.username;
+  const password = req.body.password;
+  const userType = req.body.tutor_student_rad;
+
   try {
-    const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]);
-    try {
+      let user, tableName;
+      if (userType === "tutor") {
+          tableName = 'tutors';
+      } else {
+          tableName = 'students';
+      }
 
-      const password = req.body.password;;
+      user = await db.one(`SELECT * FROM ${tableName} WHERE username = $1 LIMIT 1;`, [username]);
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
-        // Save user details in the session
-        req.session.user = user;
-        req.session.save();
-        res.redirect('/discover'); //or whatever landing page? Calendar maybe?
+          req.session.user = user;
+          req.session.save();
+          res.redirect('/discover');
       } else {
-        // Incorrect password
-        res.render('pages/loginStudent', {
-          error: true,
-          message: "Incorrect password.",
-        });
+          res.render(`pages/login`, {
+              error: true,
+              message: "Incorrect password.",
+          });
       }
-    } catch (error) { //should not happen
-      console.error('Error during password comparison:', error);
-      res.status(500).send('Internal Server Error');
-    }
   } catch (error) {
-    res.render('pages/register', {
-      error: true,
-      message: "Username not found! Register here.",
-    });
-  }
-});
-
-app.post('/loginTutor', async (req, res) => {
-
-  // Find the user based on the entered username
-  try {
-    const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]);
-    try {
-
-      const password = req.body.password;;
-      const match = await bcrypt.compare(password, user.password);
-
-      if (match) {
-        // Save user details in the session
-        req.session.user = user;
-        req.session.save();
-        res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
-      } else {
-        // Incorrect password
-        res.render('pages/loginTutor', {
+      res.render('pages/register', {
           error: true,
-          message: "Incorrect password.",
-        });
+          message: "Username not found! Register here.",
+      });
       }
-    } catch (error) { //should not happen
-      console.error('Error during password comparison:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  } catch (error) {
-    res.render('pages/register', {
-      error: true,
-      message: "Username not found! Register here.",
-    });
-  }
 });
 
 app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.render('pages/logout', {
-    message: "Was able to logout successfully!",
-  });
+  if (req.session) {
+      req.session.destroy((err) => {
+          if (err) {
+              console.error('Error destroying session:', err);
+              res.status(500).send('Internal Server Error');
+          } else {
+              res.render('pages/logout', {
+                  message: "Logged out successfully!",
+              });
+          }
+      });
+  } else {
+      res.render('pages/logout', {
+          message: "No session to log out from.",
+      });
+  }
 });
+
 
 
 app.post('/register', async (req, res) => {
@@ -257,7 +237,7 @@ app.post('/register', async (req, res) => {
     let preemptResponse = await db.any(preemptQuery, preemptValue);
     if (preemptResponse.length != 0) {//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This tutor already exists; cannot register.');
-      res.render('pages/loginTutor', {
+      res.render('pages/login', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
@@ -287,7 +267,7 @@ app.post('/register', async (req, res) => {
     let preemptResponse = await db.any(preemptQuery, preemptValue);
     if (preemptResponse.length != 0) {//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This student already exists; cannot register.');
-      res.redirect('pages/loginStudent', {
+      res.redirect('pages/login', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
@@ -316,7 +296,7 @@ app.post('/register', async (req, res) => {
 const auth = (req, res, next) => {
   if (!req.session.user) {
     // Default to login page.
-    return res.redirect('/loginStudent?error=true&message=Please log in to continue.');
+    return res.redirect('/login?error=true&message=Please log in to continue.');
   }
   next();
 };
@@ -450,7 +430,7 @@ app.post('/registerInfoTutor', async (req, res) => {
       });
 
       req.session.destroy(); // log out and redirect to log in
-      res.redirect('/loginTutor');
+      res.redirect('/login');
   } catch (error) {
       console.error('Error:', error.message);
       res.redirect('/register'); // redirect back to registration page in case of error
@@ -476,7 +456,8 @@ app.post('/registerInfoStudent', async (req, res) => {
   }
   else {
     console.log('Success: User modified - students table.');
-    res.redirect('/loginStudent');
+    req.session.destroy();
+    res.redirect('/login');
   }
 });
 
