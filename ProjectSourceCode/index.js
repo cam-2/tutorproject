@@ -10,22 +10,54 @@ const bcrypt = require('bcrypt'); //  To hash passwords
 const { name } = require('body-parser');
 const json = require('body-parser/lib/types/json');
 const { error } = require('console');
+const { Router } = require('express');
+const multer  = require('multer');
+const sharp = require('sharp');
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img');
+  },
+  filename : (req, file, cb) => {
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `user-${req.session.user.id}-${Date.now()}.${ext}`);
+  }
+});
+
+const multerFilter = (req, file, cb) => {
+  if(file.mimetype.startsWith('image')) {
+    cb(null, true);
+  }
+  else {
+    cb(new Error("Please upload an image.", 400), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  fileFilter: multerFilter
+});
+
+exports.uploadUserPhoto = upload.single('uploaded_file');
+
+exports.resizeUserPhoto = async (req, res, next) => {
+  if (!req.file) return next();
+
+  req.file.filename = `user-${req.session.user.id}-${Date.now()}.jpeg`;
+
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .toFile(`public/img/${req.file.filename}`);
+
+  next();
+};
 
 const hbs = handlebars.create({
   extname: 'hbs',
   layoutsDir: __dirname + '/views/layouts', //not used rn
   partialsDir: __dirname + '/views/partials', //not used rn
 });
-
-// database configuration
-const dbConfig = {
-  host: 'db', // the database server
-  port: 5432, // the database port
-  database: process.env.POSTGRES_DB, // the database name
-  user: process.env.POSTGRES_USER, // the user account to connect with
-  password: process.env.POSTGRES_PASSWORD, // the password of the user account
-};
 
 const broaddbConfig = {
   host: process.env.host, // the database server
@@ -46,15 +78,11 @@ db.connect()
     console.log('ERROR:', error.message || error);
   });
 
-
-
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
-
-
 
 app.use(
   session({
@@ -69,7 +97,7 @@ app.use(
     extended: true,
   })
 );
-
+ 
 app.use(express.static(__dirname + '/public'));
 
 const checkSessionMiddleware = (req, res, next) => { //used to check for session in order to display logout button
@@ -101,7 +129,7 @@ app.get('/landing', (req, res) => {
 
 
 
-// // function used for getting the average rating of a tutor
+// // function used for getting the average rating of a tutor --deprecated
 // async function getTutorAverageRating(tutorId) {
 //   try {
 //     // get avg rating from ratings table for the tutor  
@@ -116,6 +144,7 @@ app.get('/landing', (req, res) => {
 //   }
 // }
 // // new route that shows the tutor rating on a seperate page because i couldnt get it to work on the discover page, gonna try to get it to work on the discover page soon
+//  --deprecated
 // app.get('/tutorProfile/:tutorId', async (req, res) => {
 //   const tutorId = req.params.tutorId;
 //   try {
@@ -150,9 +179,10 @@ app.get('/about/:name', async (req, res) => {
       INNER JOIN tutor_subjects ON subjects.subject_id = tutor_subjects.subject_id
       WHERE tutor_subjects.tutor_id = $1
     `, [req.params.name]);
-
+    const tutorsPosts = await db.any(`SELECT * FROM posts WHERE posts.fk_tutor_id = $1`, [req.params.name]); // used for getting the posts of the tutor
+    // console.log('tutorPosts:', tutorsPosts); // used for debug
     // render page with given tutor
-    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored});
+    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored, posts: tutorsPosts});
   } catch (error) {
     // err handling 
     console.log('Error loading about', error);
@@ -411,17 +441,20 @@ app.post("/search", async (req, res) => {
 
 
 
-app.post('/registerInfoTutor', async (req, res) => {
+app.post('/registerInfoTutor', upload.single('uploaded_file'), async (req, res) => {
   console.log('req.body: ', req.body);
   console.log('req.session.user.id: ', req.session.user.id);
+  console.log('req.file: ', req.file);
+  console.log('filename: ', req.file.filename);
 
   const { first_name, last_name, email, topics } = req.body;
   const tutorId = req.session.user.id;
+  const filename = req.file.filename;
 
   try {
       await db.tx(async t => {
           // Update tutors table
-          await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = $4', [first_name, last_name, email, tutorId]);
+          await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3, img_url = $4 WHERE id = $5', [first_name, last_name, email, filename, tutorId]);
           console.log('Success: User modified - tutors table.');
 
           // Insert new entries for selected subjects into tutor_subjects table using SQL join
