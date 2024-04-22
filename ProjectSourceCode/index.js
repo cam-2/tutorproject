@@ -72,6 +72,14 @@ app.use(
 
 app.use(express.static(__dirname + '/public'));
 
+const checkSessionMiddleware = (req, res, next) => { //used to check for session in order to display logout button
+  const sessionExists = req.session && req.session.user;
+  res.locals.session = sessionExists;
+  next();
+};
+
+app.use(checkSessionMiddleware); //applys the session check.
+
 app.get('/welcome', (req, res) => {
   res.json({ status: 'success', message: 'Welcome!' });
 });
