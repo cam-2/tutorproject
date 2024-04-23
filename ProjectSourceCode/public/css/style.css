@@ -139,6 +139,113 @@
     padding: 20px;
 }
 
+.form-container {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px 40px;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 360px;
+}
+
+.form-container h1 {
+
+    font-weight: 350;
+}
+
+.form-container span {
+    font-size: 12px;
+}
+
+.form-container p {
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.3px;
+    margin: 20px 0;
+}
+
+.form-container button {
+    margin-top: 10px;
+    background-color: black;
+    color: #fff;
+    font-size: 15px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.form-container input::file-selector-button {
+
+    background-color: black;
+    color: #fff;
+    font-size: 15px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+}
+
+.form-container input::file-selector-button:hover {
+
+    opacity: 80%;
+    cursor: pointer;
+}
+
+.form-container input {
+
+    background-color: #eee;
+    border: none;
+    margin: 8px 0;
+    padding: 10px 15px;
+    font-size: 15px;
+    border-radius: 10px;
+    outline: none;
+}
+
+.form-container button:hover {
+
+    opacity: 80%;
+}
+
+.form-container select {
+
+    margin: 5px 0px;
+    user-select: none;
+    box-sizing: border-box;
+    position: relative;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1;
+    border-color: #ccc;
+    width: auto;
+    display: inline-block;
+    width: 100%;
+}
+
+.form-container select:focus, select:hover {
+    border-color: black;
+}
+
+.radio {
+    
+    accent-color: #966cf8;
+}
+
+.sign-up{
+
+    width: 50%;
+}
+
 .posts {
     
     position: absolute;
