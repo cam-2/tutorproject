@@ -96,9 +96,11 @@ app.get('/landing', (req, res) => {
 app.get('/discover', async (req, res) => {
   try {
     const tutors = await db.any(`
-      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
       FROM tutors
       LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      LEFT JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id
+      LEFT JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
       GROUP BY tutors.id
       ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
     `);
@@ -108,7 +110,8 @@ app.get('/discover', async (req, res) => {
       username: tutor.username,
       firstName: tutor.first_name,
       lastName: tutor.last_name,
-      averageRating: tutor.average_rating
+      averageRating: tutor.average_rating,
+      subjects: tutor.subjects
     }));
 
     res.render('pages/discover', { tutors: tutorData });
@@ -161,8 +164,15 @@ app.get('/about/:name', async (req, res) => {
       WHERE tutors.id = $1
       GROUP BY tutors.id
     `, [req.params.name]);
+    const subjectsTutored = await db.any(`
+      SELECT subjects.* as subTutored
+      FROM subjects
+      INNER JOIN tutor_subjects ON subjects.subject_id = tutor_subjects.subject_id
+      WHERE tutor_subjects.tutor_id = $1
+    `, [req.params.name]);
+
     // render page with given tutor
-    res.render('./pages/about.hbs', { tutor: tutorDetails });
+    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored});
   } catch (error) {
     // err handling 
     console.log('Error loading about', error);
@@ -335,9 +345,11 @@ app.post("/search", async (req, res) => {
   try {
 
     var tutors = await db.any(`
-      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
       FROM tutors
       LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      LEFT JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id
+      LEFT JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
       WHERE first_name ILIKE $1 OR last_name ILIKE $1
       GROUP BY tutors.id
       ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
@@ -348,7 +360,8 @@ app.post("/search", async (req, res) => {
         username: tutor.username,
         firstName: tutor.first_name,
         lastName: tutor.last_name,
-        averageRating: tutor.average_rating
+        averageRating: tutor.average_rating,
+        subjects: tutor.subjects
       }));
 
       res.render('pages/discover', { tutors: tutorData });
@@ -356,7 +369,7 @@ app.post("/search", async (req, res) => {
 
     else {
       tutors = await db.any(`
-        SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating
+        SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
         FROM tutors
         INNER JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id 
         INNER JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
@@ -372,7 +385,8 @@ app.post("/search", async (req, res) => {
           username: tutor.username,
           firstName: tutor.first_name,
           lastName: tutor.last_name,
-          averageRating: tutor.average_rating
+          averageRating: tutor.average_rating,
+          subjects: tutor.subjects
         }));
 
         res.render('pages/discover', { tutors: tutorData });
@@ -418,18 +432,16 @@ app.post('/registerInfoTutor', async (req, res) => {
           console.log('Success: User modified - tutors table.');
 
           // Insert new entries for selected subjects into tutor_subjects table using SQL join
-          console.log("Test")
-          //if (subjects && subjects.length > 0) {
-              const insertQuery = `
-                INSERT INTO tutor_subjects (subject_id, tutor_id)
-                SELECT s.subject_id, $1 AS tutor_id
-                FROM subjects s
-                WHERE s.subject_name IN ($2:csv)
-              `;
-              console.log("Got here");
-              await t.none(insertQuery, [tutorId, topics]);
-              console.log('Success: Updated tutor_subjects table with new subjects');
-          //}
+          //console.log("Test")
+          const insertQuery = `
+            INSERT INTO tutor_subjects (subject_id, tutor_id)
+            SELECT s.subject_id, $1 AS tutor_id
+            FROM subjects s
+            WHERE s.subject_name IN ($2:csv)
+          `;
+          await t.none(insertQuery, [tutorId, topics]);
+          console.log('Success: Updated tutor_subjects table with new subjects');
+
       });
 
       req.session.destroy(); // log out and redirect to log in
