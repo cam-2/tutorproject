@@ -8,56 +8,41 @@
             </b>
         </font>    
     </div>
-    <form action="/registerInfoTutor" method="POST">
-        <div>
-            <label for='first_name'>
-                <b>First Name:</b>
-            </label>
-        </div>
-        <div>
-            <input name='first_name' required>
-        </div>
+    <form action="/registerInfoTutor" enctype="multipart/form-data" method="POST">
+        <div class = "form-group">
 
-        <div>
-            <label for='last_name'>
-                <b>Last Name:</b>
-            </label>
-        </div>
-        <div>
-            <input name="last_name"></input>
-        </div>
+            <label for='first_name'> <b>First Name:</b> </label>
+            <input type = "text" class = "form-control" name='first_name' required>
 
-        <div>
-            <label for='email'>
-                <b>Email:</b>
-            </label>
-        </div>
-        <div>
-            <input name="email"></input>
-        </div>
+            <label for='last_name'> <b>Last Name:</b> </label>
+            <input type = "text" class="form-control" name="last_name"></input>
 
-        <div>
-            <label for='topics'>
-                <b>Topics:</b>
-            </label>
-        </div>
-        <div>
-            <select name="topics[]" multiple>
-                <option value="Math">Math</option>
-                <option value="Physics">Physics</option>
-                <option value="History">History</option>
-                <option value="English">English</option>
-                <option value="Philosophy">Philosophy</option>
-                <option value="Chemistry">Chemistry</option>
-                <option value="Biology">Biology</option>
-                <option value="Calculus">Calculus</option>
-                <option value="Probability">Probability</option>
-                <!-- etc -->
-            </select>
-        </div>
+            <label for='email'> <b>Email:</b> </label>
+            <input type = "email"  class="form-control" name="email"></input>
 
-        <div>
-            <Button type='submit' class='btn btn-primary'>Submit</Button>
+            <label for='topics'> <b>Topics:</b> </label>
+                <div>
+                    <select name="topics[]" multiple>
+                        <option value="Math">Math</option>
+                        <option value="Physics">Physics</option>
+                        <option value="History">History</option>
+                        <option value="English">English</option>
+                        <option value="Philosophy">Philosophy</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Biology">Biology</option>
+                        <option value="Calculus">Calculus</option>
+                        <option value="Probability">Probability</option>
+                        <!-- etc -->
+                    </select>
+                </div>
+                
+            <label for 'uploaded-file"'>Profile Photo: </label>
+            <input type="file" class="form-control-file" name="uploaded_file">
+
+            <div>
+                <Button type='submit' class='btn btn-primary'>Submit</Button>
+            </div>
+
         </div>
     </form>
 </center>
