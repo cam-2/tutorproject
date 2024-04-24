@@ -74,12 +74,6 @@
     transform: translate(-50%, -50%);
 }
 
-.aboutPage {
-
-    margin-top: 10%;
-    margin-left: 6%;
-}
-
 .aboutPage h1 {
 
     font-weight: bolder;
@@ -93,12 +87,6 @@
     font-size: 1em;
 }
 
-.aboutText {
-
-    box-sizing: border-box;
-    width: 35%;
-}
-
 .aboutText h4 {
 
     margin-top: 50px;
@@ -108,7 +96,7 @@
 .bookButton {
 
     margin-top: 50px;
-    margin-left: 10%;
+    margin-left: 125px;
 }
 
 .bookButton a {
@@ -128,15 +116,12 @@
 
 .bookButton a:hover {
 
-    font-size: 1.05em;
     opacity: 85%;
 }
 
 .container {
 
-    display: flexbox;
-    justify-content: space-between;
-    padding: 20px;
+    display: flex;
 }
 
 .form-container {
@@ -326,17 +311,19 @@
     opacity: 85%;
 }
 
-#tutorimg img{
+#aboutPage {
 
-    position: absolute;
-    left: 55%;
-    transform: translate(0%, -80%);
+    margin-top: 9%;
+    flex-direction: row;
 }
 
-#tutorimg {
+#tutorimg h4 {
 
-    width: 40%;
-    position: absolute;
-    left: 55%;
-    transform: translate(0%, -500%);
+    padding-left: 20px;
+    transform: translate(10%, 300%);
+}
+
+#tutorInfo {
+
+    flex-direction: column;
 }

@@ -1,57 +1,71 @@
 <body>
 
-    <div class="aboutPage">
-        <h1>About {{tutor.first_name}}</h1>
+    <div class = "container" id = "aboutPage">
+        
+        <div class = "container" id ="aboutInfo">
+            <div>
+                <h1>About {{tutor.first_name}}</h1>
 
-        <div class="averageRating">
-            <h5>
-                {{#if tutor.average_rating}}
-                Rating: {{tutor.average_rating}}
-                {{else}}
-                No ratings yet!
-                {{/if}}
-            </h5>
-        </div>
-
-        <div class="subjects">
-            <h5>
-                {{#each subjects}}
-                {{this.subject_name}} {{#unless @last}},{{/unless}}
-                {{/each}}
-            </h5>
-        </div>
-
-        <div class="aboutText">
-            {{#if tutor.average_rating}}
-            <h4>{{tutor.about}}</h4>
-            {{else}}
-            <h4>{{tutor.first_name}} Needs to update their about.</h4>
-            {{/if}}
-        </div>
-
-        <div class="bookButton">
-            <a href="">Book</a>
-        </div>
-
-        <div id = "tutorimg">
-            {{#if tutor.img_url}}
-                <img src = "../img/{{tutor.img_url}}" alt = "{{tutor.first_name}}'s profile photo.">
-            {{else}}
-            <h4>{{tutor.first_name}} has not uploaded a profile photo.</h4>
-            {{/if}}
-        </div>
-
-    </div>
-
-    <div class= "container">
-        <div class="posts">
-            {{#each posts}}
-                <div class="post">
-                    <h5>{{this.title}}</h5>
-                    <p>{{this.content}}</p>
-                    <p>{{this.likes}}</p>
+                <div class="averageRating">
+                    <h5>
+                        {{#if tutor.average_rating}}
+                        Rating: {{tutor.average_rating}}
+                        {{else}}
+                        No ratings yet!
+                        {{/if}}
+                    </h5>
                 </div>
-            {{/each}}
+
+                <div class="subjects">
+                    <h5>
+                        {{#each subjects}}
+                        {{this.subject_name}} {{#unless @last}},{{/unless}}
+                        {{/each}}
+                    </h5>
+                </div>
+
+                <div class="aboutText">
+                    {{#if tutor.average_rating}}
+                    <h4>{{tutor.about}}</h4>
+                    {{else}}
+                    <h4>{{tutor.first_name}} Needs to update their about.</h4>
+                    {{/if}}
+                </div>
+
+                <div class="bookButton">
+                    <a href="">Book</a>
+                </div>
+
+            </div>
         </div>
+
+        <div class = "container" id = "tutorInfo">
+
+            <div class = "container" id = "imageContainer">
+                <div id = "tutorimg">
+                    {{#if tutor.img_url}}
+                        <img src = "../img/{{tutor.img_url}}" alt = "{{tutor.first_name}}'s profile photo.">
+                    {{else}}
+                    <h4>{{tutor.first_name}} has not uploaded a profile photo.</h4>
+                    {{/if}}
+                </div>
+            </div>
+
+            <div class = "container">
+                <div class="posts">
+                    {{#each posts}}
+                        <div class="post">
+                            <h5>{{this.title}}</h5>
+                            <p>{{this.content}}</p>
+                            <p>{{this.likes}}</p>
+                        </div>
+                    {{/each}}
+                </div>
+            </div>
+
+        </div>
+
     </div>
+
+
 </body>
