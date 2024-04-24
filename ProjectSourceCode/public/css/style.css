@@ -126,6 +126,46 @@
     opacity: 85%;
 }
 
+.container {
+
+    display: flexbox;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.posts {
+    
+    position: absolute;
+    left: 55%;
+    transform: translate(-10%, 5%);
+    flex: 1; 
+    margin-top: 20px;
+    padding: 5px;
+
+}
+
+.post {
+    
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    font-size: smaller;
+}
+
+.post h4 {
+    
+    margin: 0 0 10px 0;
+}
+
+.post p {
+
+    margin: 5px 0;
+}
+
+.averageRating, .subjects, .aboutText, .bookButton {
+
+    margin-bottom: 10px;
+}
+
 #landing {
 
     margin-left: 20px;
