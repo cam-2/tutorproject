@@ -1,98 +1,84 @@
+<div style = "margin-top: 5%;"></div>
 {{>message}}
 
-<head>
-  <title>Calendar</title>
-  <!-- @TODO: Include all external resources - Bootstrap libraries, script.js and style.css -->
-  <!-- Bootstrap CSS library -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-  <!-- Bootstrap JS library -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-    crossorigin="anonymous"></script>
-  <!-- Bootstrap icons library -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" />
-  <script src="./resources/js/script.js"></script>
-  <link rel="stylesheet" href="./resources/css/style.css" />
-</head>
-
-
-{{!--
-    <body onload="initializeCalendar()">
-    <!-- Calendar elements -->
-    <div class="container">
-        <div id="calendar" class="row"></div>
-    </div>
-    <!-- Modal elements -->
-    <div class="modal" tabindex="-1" id="event-modal">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">Create Event</div>
-            <div class="modal-body">
-            <form>
-                <div class="mb-3">
-                <label for="event_name" class="form-label">Event Name</label>
-                <input type="text" id="event_name" class="form-control">
-                </div>
-                <div class="mb-3">
-                <label for="event_weekday" class="form-label">Weekday</label>
-                <select id="event_weekday" class="form-control">
-                    <option>Sunday</option>
-                    <option>Monday</option>
-                    <option>Tuesday</option>
-                    <option>Wednesday</option>
-                    <option>Thursday</option>
-                    <option>Friday</option>
-                    <option>Saturday</option>
-                </select>
-                </div>
-                <div class="mb-3">
-                <label for="event_time" class="form-label">Time</label>
-                <input type="time" id="event_time" class="form-control">
-                </div>
-                <div class="mb-3">
-                <label for="event_modality" class="form-label">Event Modality</label>
-                <select id="event_modality" class="form-control" required onchange="updateLocationOptions(this.value)">
-                    <option value="In-Person">In-Person</option>
-                    <option value="Remote">Remote</option>
-                </select>
-                </div>
-                <div class="mb-3">
-                <label for="event_location" class="form-label">Location</label>
-                <input type="text" id="event_location" class="form-control">
-                </div>
-                <div class="mb-3 hidden">
-                <label for="event_remote_url" class="form-label">Remote URL</label>
-                <input type="text" id="event_remote_url" class="form-control"
-                    placeholder="Meeting URL (Zoom, MS Teams, etc.)" pattern="^(http|https)://www\..*\..+">
-                </div>
-                <div class="mb-3">
-                <label for="event_attendees" class="form-label">Attendees</label>
-                <input type="text" id="event_attendees" class="form-control"
-                    placeholder="Names of attendees separated by commas">
-                </div>
-
-            </div>
-            <div class="modal-footer">
-            <button id="close_button" class="btn btn-secondary" data-bs-dismiss="modal">
-                Close
-            </button>
-            <button id="submit_button" class="btn btn-primary" type="submit">
-                Create Event
-            </button>
-            </div>
-            </form>
-        </div>
-        </div>
-    </div>
-    </body> 
---}}
-
 <div>
-    <form action="/calendar" method="POST">
-        <div>
-            <Button type='submit' class='btn btn-primary'>Insert pre-baked entry into availabilities table.</Button>
+  <script type="module" src="./calendarScripts.js"></script>
+
+  <center>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+      Add an Appointment
+    </button>
+    <!-- Add an event modal button -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add an Appointment</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+                    <div>
+                      <form action="/addCalendarEvent" method="POST">
+                        <div>
+                          <input type="text" id="dummy-textblock" name="evnt_subj">
+                          <br>
+                          <input type="datetime-local" id="dummy_starttime" name="evnt_stime">
+                          <br>
+                          <input type="datetime-local" id="dummy_endtime" name="evnt_etime">
+                          <br>
+                          <!-- I NEED TO GET THE TUTORS ID FROM THE TABLE, NOT SURE HOW YET, MAYBE DO ON JS SIDE -->
+                          <input type="number" id="dummy_tutid" name="evnt_tutid">
+                        </div>
+                      {{!-- </form> --}}
+                    </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+          </form>
         </div>
-    </form>
+      </div>
+    </div>
+  </center>
+
+  <div class="container">
+    <div id="event-modal">
+      <div id="calendar" class="row">
+        <!-- CHANGE FUNC CALL TO getDayCol(day):
+                NEED TO PREFORMAT DAY BEFORE CALLING
+                BUT NECESSARY IF WANT TO RENDER OTHER
+                WEEKS THAN JUST THIS WEEK
+        -->
+        {{#each synthedData}}
+          <div class="col">
+            <h2>{{dayName}} ({{date}})</h2>
+            {{#if events.length}}
+              {{#each events}}
+                <div class="event-box">
+                  <p>Event ID: {{id}}, Subject: {{subject}}, Start Time: {{start_time}}</p>
+                  <!-- Add more event details as needed -->
+                </div>
+                <div>
+                  <!-- EDIT AN APPOINTMENT LOGIC GOES HERE (BOOK IT, CHANGE FIELDS IF PROPER TUTOR, ETC.) 
+                       THIS WILL BE A BUTTON TO OPEN THE MODAL FORM.
+                       LOOK AT 'ADD APPOINTMENT' BUTTON FOR INSPIRATION
+                  -->
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="event-box"> <!-- I'm not 100% sure if the data-toggle should be event-box or not -->
+                    Edit
+                  </button>
+                </div>
+              {{/each}}
+            {{else}}
+              <p>No events for this day.</p>
+            {{/if}}
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>   
 </div>
+

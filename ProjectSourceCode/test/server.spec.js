@@ -100,3 +100,21 @@ describe('Testing Login API', () => {
             });
     });
 });
+
+// describe('Removing Test Cases from DB', () => {
+//     it('Removing test cases...', done => {
+//         chai
+//             .request(server)
+//             .post('/removeTests')
+//             .redirects(0)
+//             .send({
+//             //     username: 'invalid',
+//             //     password: 'password123'
+//             })
+//             .end((err, res) => {
+//                 res.should.have.status(302);
+//                 res.text.should.include('Successfully removed.');
+//                 done();
+//             });
+//     });
+// });
