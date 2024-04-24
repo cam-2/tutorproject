@@ -74,6 +74,12 @@
     transform: translate(-50%, -50%);
 }
 
+.aboutPage {
+
+    margin-top:8%;
+    margin-left:10%;
+}
+
 .aboutPage h1 {
 
     font-weight: bolder;
@@ -81,22 +87,22 @@
     font-family: Arial, Helvetica, sans-serif
 }
 
-.aboutPage h5 {
+.aboutText {
 
-    opacity: 90%;
-    font-size: 1em;
+    box-sizing: border-box;
+    width: 45%;
 }
 
 .aboutText h4 {
 
     margin-top: 50px;
-    font-weight: 300;
+    font-weight: 350;
 }
 
 .bookButton {
 
     margin-top: 50px;
-    margin-left: 125px;
+    margin-left: 15%;
 }
 
 .bookButton a {
@@ -116,153 +122,8 @@
 
 .bookButton a:hover {
 
+    font-size: 1.05em;
     opacity: 85%;
-}
-
-.container {
-
-    display: flex;
-}
-
-
-.form-container {
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    padding: 20px 40px;
-    background-color: #fff;
-    border-radius: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
-    position: relative;
-    overflow: hidden;
-    width: 768px;
-    max-width: 100%;
-    min-height: 360px;
-}
-
-.form-container h1 {
-
-    font-weight: 350;
-}
-
-.form-container span {
-    font-size: 12px;
-}
-
-.form-container p {
-    font-size: 14px;
-    line-height: 20px;
-    letter-spacing: 0.3px;
-    margin: 20px 0;
-}
-
-.form-container button {
-    margin-top: 10px;
-    background-color: black;
-    color: #fff;
-    font-size: 15px;
-    padding: 10px 20px;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}
-
-.form-container input::file-selector-button {
-
-    background-color: black;
-    color: #fff;
-    font-size: 15px;
-    padding: 5px 10px;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    letter-spacing: 0.5px;
-}
-
-.form-container input::file-selector-button:hover {
-
-    opacity: 80%;
-    cursor: pointer;
-}
-
-.form-container input {
-
-    background-color: #eee;
-    border: none;
-    margin: 8px 0;
-    padding: 10px 15px;
-    font-size: 15px;
-    border-radius: 10px;
-    outline: none;
-}
-
-.form-container button:hover {
-
-    opacity: 80%;
-}
-
-.form-container select {
-
-    margin: 5px 0px;
-    user-select: none;
-    box-sizing: border-box;
-    position: relative;
-    border-radius: 4px;
-    border-style: solid;
-    border-width: 1;
-    border-color: #ccc;
-    width: auto;
-    display: inline-block;
-    width: 100%;
-}
-
-.form-container select:focus, select:hover {
-    border-color: black;
-}
-
-.radio {
-    
-    accent-color: #966cf8;
-}
-
-.sign-up{
-
-    width: 50%;
-}
-
-.posts {
-    
-    position: absolute;
-    left: 55%;
-    transform: translate(-10%, 5%);
-    flex: 1; 
-    margin-top: 20px;
-    padding: 5px;
-
-}
-
-.post {
-    
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-    font-size: smaller;
-}
-
-.post h4 {
-    
-    margin: 0 0 10px 0;
-}
-
-.post p {
-
-    margin: 5px 0;
-}
-
-.averageRating, .subjects, .aboutText, .bookButton {
-
-    margin-bottom: 10px;
 }
 
 #landing {
@@ -310,20 +171,4 @@
 
     font-size: 1.05em;
     opacity: 85%;
-}
-#aboutPage {
-
-    margin-top: 9%;
-    flex-direction: row;
-}
-
-#tutorimg h4 {
-
-    padding-left: 20px;
-    transform: translate(10%, 300%);
-}
-
-#tutorInfo {
-
-    flex-direction: column;
 }
