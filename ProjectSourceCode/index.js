@@ -10,54 +10,22 @@ const bcrypt = require('bcrypt'); //  To hash passwords
 const { name } = require('body-parser');
 const json = require('body-parser/lib/types/json');
 const { error } = require('console');
-const { Router } = require('express');
-const multer  = require('multer');
-const sharp = require('sharp');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/img');
-  },
-  filename : (req, file, cb) => {
-    const ext = file.mimetype.split('/')[1];
-    cb(null, `user-${req.session.user.id}-${Date.now()}.${ext}`);
-  }
-});
-
-const multerFilter = (req, file, cb) => {
-  if(file.mimetype.startsWith('image')) {
-    cb(null, true);
-  }
-  else {
-    cb(new Error("Please upload an image.", 400), false);
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  fileFilter: multerFilter
-});
-
-exports.uploadUserPhoto = upload.single('uploaded_file');
-
-exports.resizeUserPhoto = async (req, res, next) => {
-  if (!req.file) return next();
-
-  req.file.filename = `user-${req.session.user.id}-${Date.now()}.jpeg`;
-
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .toFile(`public/img/${req.file.filename}`);
-
-  next();
-};
 
 const hbs = handlebars.create({
   extname: 'hbs',
   layoutsDir: __dirname + '/views/layouts', //not used rn
   partialsDir: __dirname + '/views/partials', //not used rn
 });
+
+// database configuration
+const dbConfig = {
+  host: 'db', // the database server
+  port: 5432, // the database port
+  database: process.env.POSTGRES_DB, // the database name
+  user: process.env.POSTGRES_USER, // the user account to connect with
+  password: process.env.POSTGRES_PASSWORD, // the password of the user account
+};
 
 const broaddbConfig = {
   host: process.env.host, // the database server
@@ -77,6 +45,8 @@ db.connect()
   .catch(error => {
     console.log('ERROR:', error.message || error);
   });
+
+
 
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
@@ -100,16 +70,8 @@ app.use(
     extended: true,
   })
 );
- 
+
 app.use(express.static(__dirname + '/public'));
-
-const checkSessionMiddleware = (req, res, next) => { //used to check for session in order to display logout button
-  const sessionExists = req.session && req.session.user;
-  res.locals.session = sessionExists;
-  next();
-};
-
-app.use(checkSessionMiddleware); //applys the session check.
 
 app.get('/welcome', (req, res) => {
   res.json({ status: 'success', message: 'Welcome!' });
@@ -120,19 +82,46 @@ app.get('/', (req, res) => {
   res.redirect('/landing');
 });
 
-app.get('/login', (req, res) => {
-  const message = req.query.message || ''; // Extract the message from query params
-  const error = req.query.error === 'true'; // Check if error flag is true
-  res.render('./pages/login.hbs', { message, error });
+app.get('/loginStudent', (req, res) => {
+  res.render('./pages/loginStudent.hbs');
+});
+app.get('/loginTutor', (req, res) => {
+  res.render('./pages/loginTutor.hbs');
 });
 
 app.get('/landing', (req, res) => {
   res.render('./pages/landingPage.hbs');
 });
 
+app.get('/discover', async (req, res) => {
+  try {
+    const tutors = await db.any(`
+      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
+      FROM tutors
+      LEFT JOIN ratings ON tutors.id = ratings.tutor_id
+      LEFT JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id
+      LEFT JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
+      GROUP BY tutors.id
+      ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
+    `);
 
+    const tutorData = tutors.map(tutor => ({
+      id: tutor.id,
+      username: tutor.username,
+      firstName: tutor.first_name,
+      lastName: tutor.last_name,
+      averageRating: tutor.average_rating,
+      subjects: tutor.subjects
+    }));
 
-// // function used for getting the average rating of a tutor --deprecated
+    res.render('pages/discover', { tutors: tutorData });
+  } catch (error) {
+    console.error(error);
+    res.render('pages/discover', { tutors: [], message: 'An error occurred while fetching tutors.', error: true });
+  }
+});
+
+// // function used for getting the average rating of a tutor
 // async function getTutorAverageRating(tutorId) {
 //   try {
 //     // get avg rating from ratings table for the tutor  
@@ -147,7 +136,6 @@ app.get('/landing', (req, res) => {
 //   }
 // }
 // // new route that shows the tutor rating on a seperate page because i couldnt get it to work on the discover page, gonna try to get it to work on the discover page soon
-//  --deprecated
 // app.get('/tutorProfile/:tutorId', async (req, res) => {
 //   const tutorId = req.params.tutorId;
 //   try {
@@ -182,10 +170,9 @@ app.get('/about/:name', async (req, res) => {
       INNER JOIN tutor_subjects ON subjects.subject_id = tutor_subjects.subject_id
       WHERE tutor_subjects.tutor_id = $1
     `, [req.params.name]);
-    const tutorsPosts = await db.any(`SELECT * FROM posts WHERE posts.fk_tutor_id = $1`, [req.params.name]); // used for getting the posts of the tutor
-    // console.log('tutorPosts:', tutorsPosts); // used for debug
+
     // render page with given tutor
-    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored, posts: tutorsPosts});
+    res.render('./pages/about.hbs', { tutor: tutorDetails, subjects: subjectsTutored});
   } catch (error) {
     // err handling 
     console.log('Error loading about', error);
@@ -193,6 +180,9 @@ app.get('/about/:name', async (req, res) => {
   }
 });
 
+app.get('/profile', (req, res) => {
+  res.render('./pages/profile.hbs');
+});
 
 app.get('/register', (req, res) => {
   res.render('./pages/register.hbs');
@@ -204,63 +194,80 @@ app.get('/registerInfoTutor', (req, res) => {
   res.render('./pages/registerInfoTutor.hbs');
 });
 
-app.post('/login', async (req, res) => {
-  if (!req.body.username || !req.body.password || !req.body.tutor_student_rad) {
-      return res.status(400).send('Missing required field');
-  }
+app.post('/loginStudent', async (req, res) => {
 
-  const username = req.body.username;
-  const password = req.body.password;
-  const userType = req.body.tutor_student_rad;
-
+  // Find the user based on the entered username
   try {
-      let user, tableName;
-      if (userType === "tutor") {
-          tableName = 'tutors';
-      } else {
-          tableName = 'students';
-      }
+    const user = await db.one('SELECT * FROM students WHERE username = $1 LIMIT 1;', [req.body.username]);
+    try {
 
-      user = await db.one(`SELECT * FROM ${tableName} WHERE username = $1 LIMIT 1;`, [username]);
+      const password = req.body.password;;
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {
-          req.session.user = user;
-          req.session.save();
-          res.redirect('/discover');
+        // Save user details in the session
+        req.session.user = user;
+        req.session.save();
+        res.redirect('/discover'); //or whatever landing page? Calendar maybe?
       } else {
-          res.render(`pages/login`, {
-              error: true,
-              message: "Incorrect password.",
-          });
-      }
-  } catch (error) {
-      res.render('pages/register', {
+        // Incorrect password
+        res.render('pages/loginStudent', {
           error: true,
-          message: "Username not found! Register here.",
-      });
+          message: "Incorrect password.",
+        });
       }
-});
-
-app.get('/logout', (req, res) => {
-  if (req.session) {
-      req.session.destroy((err) => {
-          if (err) {
-              console.error('Error destroying session:', err);
-              res.status(500).send('Internal Server Error');
-          } else {
-              res.render('pages/logout', {
-                  message: "Logged out successfully!",
-              });
-          }
-      });
-  } else {
-      res.render('pages/logout', {
-          message: "No session to log out from.",
-      });
+    } catch (error) { //should not happen
+      console.error('Error during password comparison:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  } catch (error) {
+    res.render('pages/register', {
+      error: true,
+      message: "Username not found! Register here.",
+    });
   }
 });
 
+app.post('/loginTutor', async (req, res) => {
+
+  // Find the user based on the entered username
+  try {
+    const user = await db.one('SELECT * FROM tutors WHERE username = $1 LIMIT 1;', [req.body.username]);
+    try {
+
+      const password = req.body.password;;
+      const match = await bcrypt.compare(password, user.password);
+
+      if (match) {
+        // Save user details in the session
+        req.session.user = user;
+        req.session.save();
+        res.redirect('/discover'); //or whatever landing page? Calendaar maybe?
+      } else {
+        // Incorrect password
+        res.render('pages/loginTutor', {
+          error: true,
+          message: "Incorrect password.",
+        });
+      }
+    } catch (error) { //should not happen
+      console.error('Error during password comparison:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  } catch (error) {
+    res.render('pages/register', {
+      error: true,
+      message: "Username not found! Register here.",
+    });
+  }
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.render('pages/logout', {
+    message: "Was able to logout successfully!",
+  });
+});
 
 
 app.post('/register', async (req, res) => {
@@ -278,7 +285,7 @@ app.post('/register', async (req, res) => {
     let preemptResponse = await db.any(preemptQuery, preemptValue);
     if (preemptResponse.length != 0) {//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This tutor already exists; cannot register.');
-      res.render('pages/login', {
+      res.render('pages/loginTutor', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
@@ -308,7 +315,7 @@ app.post('/register', async (req, res) => {
     let preemptResponse = await db.any(preemptQuery, preemptValue);
     if (preemptResponse.length != 0) {//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This student already exists; cannot register.');
-      res.redirect('pages/login', {
+      res.redirect('pages/loginStudent', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
@@ -330,50 +337,6 @@ app.post('/register', async (req, res) => {
         res.redirect('/registerInfoStudent');
       }
     }
-  }
-});
-
-// Authentication Middleware.
-const auth = (req, res, next) => {
-  if (!req.session.user) {
-    // Default to login page.
-    return res.redirect('/login?error=true&message=Please log in to continue.');
-  }
-  next();
-};
-
-app.use(auth);
-
-app.get('/profile', (req, res) => {
-  res.render('./pages/profile.hbs');
-});
-
-
-app.get('/discover', async (req, res) => {
-  try {
-    const tutors = await db.any(`
-      SELECT tutors.*, ROUND(AVG(ratings.rating), 2) as average_rating, array_agg(DISTINCT subjects.subject_name) as subjects
-      FROM tutors
-      LEFT JOIN ratings ON tutors.id = ratings.tutor_id
-      LEFT JOIN tutor_subjects ON tutors.id = tutor_subjects.tutor_id
-      LEFT JOIN subjects ON tutor_subjects.subject_id = subjects.subject_id
-      GROUP BY tutors.id
-      ORDER BY COALESCE(ROUND(AVG(ratings.rating), 2), 0) DESC, first_name ASC
-    `);
-
-    const tutorData = tutors.map(tutor => ({
-      id: tutor.id,
-      username: tutor.username,
-      firstName: tutor.first_name,
-      lastName: tutor.last_name,
-      averageRating: tutor.average_rating,
-      subjects: tutor.subjects
-    }));
-
-    res.render('pages/discover', { tutors: tutorData });
-  } catch (error) {
-    console.error(error);
-    res.render('pages/discover', { tutors: [], message: 'An error occurred while fetching tutors.', error: true });
   }
 });
 
@@ -455,29 +418,18 @@ const auth = (req, res, next) => {
 app.use(auth);
 
 
-app.post('/registerInfoTutor', upload.single('uploaded_file'), async (req, res) => {
+app.post('/registerInfoTutor', async (req, res) => {
+  console.log('req.body: ', req.body);
+  console.log('req.session.user.id: ', req.session.user.id);
 
   const { first_name, last_name, email, topics } = req.body;
   const tutorId = req.session.user.id;
 
   try {
-
       await db.tx(async t => {
-
-          if(req.file) {
-
-            // Update tutors table if photo uploaded
-            const filename = req.file.filename;
-            await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3, img_url = $4 WHERE id = $5', [first_name, last_name, email, filename, tutorId]);
-            console.log('Success: User modified - tutors table.');
-          }
-
-          else {
-
-            // Update tutors table without photo uploaded
-            await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = $4', [first_name, last_name, email, tutorId]);
-            console.log('Success: User modified - tutors table.');
-          }
+          // Update tutors table
+          await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3 WHERE id = $4', [first_name, last_name, email, tutorId]);
+          console.log('Success: User modified - tutors table.');
 
           // Insert new entries for selected subjects into tutor_subjects table using SQL join
           //console.log("Test")
@@ -493,7 +445,7 @@ app.post('/registerInfoTutor', upload.single('uploaded_file'), async (req, res) 
       });
 
       req.session.destroy(); // log out and redirect to log in
-      res.redirect('/login');
+      res.redirect('/loginTutor');
   } catch (error) {
       console.error('Error:', error.message);
       res.redirect('/register'); // redirect back to registration page in case of error
