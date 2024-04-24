@@ -20,7 +20,7 @@ CREATE TABLE tutors (
     last_name VARCHAR(40),
     email VARCHAR(100),
     about VARCHAR(500),
-    img_url VARCHAR(200),
+    imgURL VARCHAR(200),
     password VARCHAR(200) NOT NULL
     -- fk_avail_id INT REFERENCES availabilities(id)
 );
@@ -68,16 +68,6 @@ CREATE TABLE availabilities (
     fk_tutor_id INT REFERENCES tutors(id) NOT NULL, -- the tutor hosting the appointment
     fk_student_id INT REFERENCES students(id), -- the student who booked the appointment, can be NULL
     booked_bool BOOLEAN -- NULL or FALSE means it hasn't been booked yet, TRUE means the appointment has been reserved
-);
-
-DROP TABLE IF EXISTS posts;
-CREATE TABLE posts (
-    id SERIAL PRIMARY KEY NOT NULL,
-    title VARCHAR(35),
-    content VARCHAR(500),
-    fk_tutor_id INT REFERENCES tutors(id) NOT NULL,
-    post_date TIMESTAMP,
-    likes INT
 );
 
 -- DROP TABLE IF EXISTS tutor_to_student;

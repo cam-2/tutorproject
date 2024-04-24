@@ -124,6 +124,7 @@
     display: flex;
 }
 
+
 .form-container {
 
     display: flex;
@@ -310,7 +311,6 @@
     font-size: 1.05em;
     opacity: 85%;
 }
-
 #aboutPage {
 
     margin-top: 9%;

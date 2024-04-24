@@ -1,0 +1,84 @@
+<div style = "margin-top: 5%;"></div>
+{{>message}}
+
+<div>
+  <script type="module" src="./calendarScripts.js"></script>
+
+  <center>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+      Add an Appointment
+    </button>
+    <!-- Add an event modal button -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add an Appointment</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+                    <div>
+                      <form action="/addCalendarEvent" method="POST">
+                        <div>
+                          <input type="text" id="dummy-textblock" name="evnt_subj">
+                          <br>
+                          <input type="datetime-local" id="dummy_starttime" name="evnt_stime">
+                          <br>
+                          <input type="datetime-local" id="dummy_endtime" name="evnt_etime">
+                          <br>
+                          <!-- I NEED TO GET THE TUTORS ID FROM THE TABLE, NOT SURE HOW YET, MAYBE DO ON JS SIDE -->
+                          <input type="number" id="dummy_tutid" name="evnt_tutid">
+                        </div>
+                      {{!-- </form> --}}
+                    </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </center>
+
+  <div class="container">
+    <div id="event-modal">
+      <div id="calendar" class="row">
+        <!-- CHANGE FUNC CALL TO getDayCol(day):
+                NEED TO PREFORMAT DAY BEFORE CALLING
+                BUT NECESSARY IF WANT TO RENDER OTHER
+                WEEKS THAN JUST THIS WEEK
+        -->
+        {{#each synthedData}}
+          <div class="col">
+            <h2>{{dayName}} ({{date}})</h2>
+            {{#if events.length}}
+              {{#each events}}
+                <div class="event-box">
+                  <p>Event ID: {{id}}, Subject: {{subject}}, Start Time: {{start_time}}</p>
+                  <!-- Add more event details as needed -->
+                </div>
+                <div>
+                  <!-- EDIT AN APPOINTMENT LOGIC GOES HERE (BOOK IT, CHANGE FIELDS IF PROPER TUTOR, ETC.) 
+                       THIS WILL BE A BUTTON TO OPEN THE MODAL FORM.
+                       LOOK AT 'ADD APPOINTMENT' BUTTON FOR INSPIRATION
+                  -->
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="event-box"> <!-- I'm not 100% sure if the data-toggle should be event-box or not -->
+                    Edit
+                  </button>
+                </div>
+              {{/each}}
+            {{else}}
+              <p>No events for this day.</p>
+            {{/if}}
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>   
+</div>
+
