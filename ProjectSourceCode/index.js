@@ -537,12 +537,14 @@ app.post('/updateProfilePhoto', upload.single('uploaded_file'), async (req,res) 
   }
 });
 
+
+
 function getDayCol(day){
   // Get the current date
     const currentDate = day;
     // Calculate the start of the week (Sunday)
     const startOfWeek = new Date(currentDate);
-    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() - 1);
+    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() );
     // Calculate the end of the week (Saturday)
     const endOfWeek = new Date(currentDate);
     endOfWeek.setDate(currentDate.getDate() + (6 - currentDate.getDay()));
@@ -598,7 +600,7 @@ function getTodayWeekStartFormed(){
   const currentDate = new Date();
   // Calculate the start of the week (Sunday)
   const startOfWeek = new Date(currentDate);
-  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() - 1);
+  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() );
   // Format dates as YYYY-MM-DD for SQL queries
   const formattedStartOfWeek = startOfWeek.toISOString().slice(0, 10);
 
@@ -682,24 +684,33 @@ app.get('/calendar', async (req, res) => {
 });
 
 app.post('/addCalendarEvent', async (req, res) => {
-  console.log('Running /addCalendarEvent POST');
-  // console.log('req.body: ', req.body);
-  // console.log('req.session.user.id: ', async(req.session.user.id));
+  //debug
+  // console.log('Running /addCalendarEvent POST');
+  // console.log('req.body: ', req.session);
+  // let auth_token = await(req.session.id);
+  // console.log('req.session.id: ', auth_token);
+  //end debug
 
   /*************
-   * 
-   * 
-   * 
-   * 
-   * NEED AUTHENTICATION MIDDLEWARE HERE
-   * SO THAT ONLY A TUTOR CAN ADD AN 
-   * AVAILABILITY TO THE CALENDAR
-   * 
-   * 
-   * 
-   * 
-   * 
+   * THIS IS MY BAD WORKAROUND TO TUTOR AUTHENTICATION ON EVENT FORM SUBMISSION
    */
+  const findTutorQ = 'SELECT * FROM tutors WHERE username = $1';
+  const uname = req.session.user.username;
+
+  try {
+    let response = await db.one(findTutorQ, uname);
+    console.log("This is r.id: ", response.id);
+    console.log('Tutor successfully authenticated. Running event queries...');
+    const debugQ = 'SELECT * FROM tutors WHERE id = $1';
+    try {
+      let dbg = await db.any(debugQ, response.id);
+      console.log("DBG: ", dbg);
+    }
+    catch(error){
+      ;
+    }
+  
+
   // if(this user is a tutor){
     const addAvailQuery = 'INSERT INTO availabilities (subject, start_time, end_time, fk_tutor_id) VALUES ($1,$2,$3,$4)';
     // const availVals = ['CHEM', '2024-04-18 13:30:00 -6:00', '2024-04-18 14:30:00 -6:00', 1];
@@ -707,8 +718,11 @@ app.post('/addCalendarEvent', async (req, res) => {
       req.body.evnt_subj,
       req.body.evnt_stime,
       req.body.evnt_etime,
-      req.body.evnt_tutid
+      response.id //This should be the tutor's id in the database
     ];
+    console.log("ReqF:");
+    console.log(reqFields);
+    console.log("/ReqF");
 
     const returnQuery = 'SELECT * FROM availabilities WHERE start_time >= $1 AND end_time <= $2';
 
@@ -724,7 +738,7 @@ app.post('/addCalendarEvent', async (req, res) => {
       formattedStartOfWeek,
       formattedEndOfWeek
     ];
-
+    console.log("???");
 
     //Run queries
     try {
@@ -756,6 +770,15 @@ app.post('/addCalendarEvent', async (req, res) => {
   // else if (user is logged in student){
     // STUFF TO MODIFY ENTRIES BY ADDING THEMSELVES AS THE 'BOOKEE', changing booked bool to true
   // }
+  }
+  catch(error){
+    console.error('Could not find tutor. Cannot run event queries.');
+    res.render('pages/discover', {
+      error: true,
+      message: "You are not a tutor. You cannot add an event.",
+    });
+    
+  }
 });
 
 app.post('/post', async (req, res) => {
