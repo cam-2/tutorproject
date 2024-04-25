@@ -326,3 +326,51 @@
 
     flex-direction: column;
 }
+
+.profileButtons {
+    margin-top: 150px;
+}
+
+.post-form {
+    background: #f0f0f0; 
+    border: 2px solid #000; 
+    border-radius: 16px; 
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+}
+
+.input-group {
+    background: #fff; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    border: 1px solid #ccc; 
+    margin-bottom: 15px;
+}
+
+.input-title,
+.input-content {
+    border: none;
+    padding: 10px 15px;
+    display: block;
+    width: calc(100% - 30px);
+}
+
+.input-title {
+    border-bottom: 1px solid #ccc;
+}
+
+.input-content {
+    min-height: 150px;
+}
+
+.post-button {
+    background: #000; 
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px; 
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
