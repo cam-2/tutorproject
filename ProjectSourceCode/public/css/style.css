@@ -236,7 +236,6 @@
     
     position: absolute;
     left: 55%;
-    transform: translate(-10%, 5%);
     flex: 1; 
     margin-top: 20px;
     padding: 5px;
