@@ -343,10 +343,18 @@ const auth = (req, res, next) => {
 
 app.use(auth);
 
-app.get('/profile', (req, res) => {
-  res.render('./pages/profile.hbs');
-});
+app.get('/profile/:name', (req, res) => {
 
+  try {
+    res.render('./pages/profile.hbs', {user});
+  }
+  catch {
+    // err handling 
+    console.log('Error loading profile', error);
+    res.status(500).send('Internal Server Error');
+
+  }
+});
 
 app.get('/discover', async (req, res) => {
   try {
@@ -510,6 +518,243 @@ app.post('/registerInfoStudent', async (req, res) => {
     req.session.destroy();
     res.redirect('/login');
   }
+});
+
+app.post('/updateProfilePhoto', upload.single('uploaded_file'), async (req,res) => {
+
+  const filename = req.file.filename;
+  const id = req.session.user.id;
+
+  try {
+
+    await t.none('UPDATE tutor SET img_url = $1 WHERE id = $2', [filename, id]);
+  }
+
+  catch {
+
+    console.log('Error: Could not update profile photo');
+  }
+});
+
+function getDayCol(day){
+  // Get the current date
+    const currentDate = day;
+    // Calculate the start of the week (Sunday)
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() - 1);
+    // Calculate the end of the week (Saturday)
+    const endOfWeek = new Date(currentDate);
+    endOfWeek.setDate(currentDate.getDate() + (6 - currentDate.getDay()));
+
+    //determine all the days in between
+    const mon = new Date(currentDate);
+    mon.setDate(startOfWeek.getDate() + 1);
+    const tue = new Date(currentDate);
+    tue.setDate(startOfWeek.getDate() + 2);
+    const wed = new Date(currentDate);
+    wed.setDate(startOfWeek.getDate() + 3);
+    const thu = new Date(currentDate);
+    thu.setDate(startOfWeek.getDate() + 4);
+    const fri = new Date(currentDate);
+    fri.setDate(startOfWeek.getDate() + 5);
+
+    // Format dates as YYYY-MM-DD for SQL queries
+    const formattedStartOfWeek = startOfWeek.toISOString().slice(0, 10);
+    const formattedMon = mon.toISOString().slice(0,10);
+    const formattedTue = tue.toISOString().slice(0,10);
+    const formattedWed = wed.toISOString().slice(0,10);
+    const formattedThu = thu.toISOString().slice(0,10);
+    const formattedFri = fri.toISOString().slice(0,10);
+    const formattedEndOfWeek = endOfWeek.toISOString().slice(0, 10);
+  //</date logic>
+
+  var weekJson = {
+    days: [
+      { dayName: 'Sunday', date: formattedStartOfWeek },
+      { dayName: 'Monday', date: formattedMon },
+      { dayName: 'Tuesday', date: formattedTue },
+      { dayName: 'Wednesday', date: formattedWed },
+      { dayName: 'Thursday', date: formattedThu },
+      { dayName: 'Friday', date: formattedFri },
+      { dayName: 'Saturday', date: formattedEndOfWeek },
+    ]
+  };
+
+  //debugging:
+    // console.log('--------:getDayCol() return:--------');
+    // console.log(weekJson);
+
+  return weekJson;
+}
+
+function getTodayCol(){
+  const todayDate = new Date();
+  const weekDates = getDayCol(todayDate);
+  return weekDates;
+}
+
+function getTodayWeekStartFormed(){
+  const currentDate = new Date();
+  // Calculate the start of the week (Sunday)
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() - 1);
+  // Format dates as YYYY-MM-DD for SQL queries
+  const formattedStartOfWeek = startOfWeek.toISOString().slice(0, 10);
+
+  // console.log("Start of the week:", formattedStartOfWeek);
+
+  return formattedStartOfWeek;
+}
+
+function getTodayWeekEndFormed(){
+  const currentDate = new Date();
+  // Calculate the end of the week (Saturday)
+  const endOfWeek = new Date(currentDate);
+  endOfWeek.setDate(currentDate.getDate() + (6 - currentDate.getDay()));
+  // Format dates as YYYY-MM-DD for SQL queries
+  const formattedEndOfWeek = endOfWeek.toISOString().slice(0, 10);
+
+  // console.log("End of the week:", formattedEndOfWeek);
+
+  return formattedEndOfWeek;
+};
+
+function synthesizeEvData (daysData, eventsOfTheWeek) {
+  //debug
+  // console.log('=========:DAYSDATA:=========',daysData,'=========END=========');
+  // console.log('=========:EVENTSOFWEEK:=========',eventsOfTheWeek,'=========END=========');
+
+  const finalProduct = daysData.days.map(day => ({
+    dayName: day.dayName,
+    date: day.date,
+    events: eventsOfTheWeek.filter(event => {
+      const eventDate = new Date(event.start_time).toISOString().slice(0, 10);
+      return eventDate === day.date;
+    }),
+  }));
+
+  //debug
+    console.log('=========FINALPROD=========');
+    finalProduct.forEach(day => {
+      console.log(`${day.dayName} (${day.date}):`);
+      day.events.forEach(event => {
+        console.log(`Event ID: ${event.id}, Subject: ${event.subject}, Start Time: ${event.start_time}`);
+      });
+    });
+    console.log('===========END===========');
+  //end debug
+
+  return finalProduct;
+};
+
+//This loads the  calendar page
+app.get('/calendar', async (req, res) => {
+  console.log('Running /calendar GET');
+
+  const returnQuery = 'SELECT * FROM availabilities WHERE start_time >= $1 AND end_time <= $2';
+
+  // Get this week's bookends (Sunday and Saturday)
+  const formattedStartOfWeek = getTodayWeekStartFormed();
+  const formattedEndOfWeek = getTodayWeekEndFormed();
+  const bookends = [
+    formattedStartOfWeek,
+    formattedEndOfWeek
+  ];
+
+  try {
+    let weeksEvents = await db.any(returnQuery, bookends);
+    // console.log('-----------:DATA:-----------');
+    // console.log(weeksEvents);
+    ////////////////////////////////
+    ////////////////////////////////
+    /////CHANGE TO getDayCol()//////
+    ////////////////////////////////
+    ////////////////////////////////
+    var synthedData = synthesizeEvData(getTodayCol(), weeksEvents);
+    console.log('Success: Loading events.');
+    res.render('pages/calendar', {synthedData});
+  }
+  catch (error) {
+    console.log('ERROR: Could not load calendar.');
+    res.render('pages/calendar', {message:'An error occurred while fetching this week\'s events.', error:true});
+  }
+});
+
+app.post('/addCalendarEvent', async (req, res) => {
+  console.log('Running /addCalendarEvent POST');
+  // console.log('req.body: ', req.body);
+  // console.log('req.session.user.id: ', async(req.session.user.id));
+
+  /*************
+   * 
+   * 
+   * 
+   * 
+   * NEED AUTHENTICATION MIDDLEWARE HERE
+   * SO THAT ONLY A TUTOR CAN ADD AN 
+   * AVAILABILITY TO THE CALENDAR
+   * 
+   * 
+   * 
+   * 
+   * 
+   */
+  // if(this user is a tutor){
+    const addAvailQuery = 'INSERT INTO availabilities (subject, start_time, end_time, fk_tutor_id) VALUES ($1,$2,$3,$4)';
+    // const availVals = ['CHEM', '2024-04-18 13:30:00 -6:00', '2024-04-18 14:30:00 -6:00', 1];
+    const reqFields = [
+      req.body.evnt_subj,
+      req.body.evnt_stime,
+      req.body.evnt_etime,
+      req.body.evnt_tutid
+    ];
+
+    const returnQuery = 'SELECT * FROM availabilities WHERE start_time >= $1 AND end_time <= $2';
+
+    // Get THIS week's bookends (Sunday and Saturday)
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // CHANGE TO BE DAY DEPENDENT
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    const formattedStartOfWeek = getTodayWeekStartFormed();
+    const formattedEndOfWeek = getTodayWeekEndFormed();
+    const bookends = [
+      formattedStartOfWeek,
+      formattedEndOfWeek
+    ];
+
+
+    //Run queries
+    try {
+      await db.none(addAvailQuery, reqFields);
+      console.log('Success: Event added.');
+
+      try {
+        let weeksEvents = await db.any(returnQuery, bookends);
+        ////////////////////////////////
+        ////////////////////////////////
+        /////CHANGE TO getDayCol()//////
+        ////////////////////////////////
+        ////////////////////////////////
+        var synthedData = synthesizeEvData(getTodayCol(), weeksEvents);
+        // console.log('-----------:DATA:-----------');
+        // console.log(weeksEvents);
+        console.log('Success: Reloading page with new event.');
+        res.render('pages/calendar', {synthedData});
+      }
+      catch (error) {
+        console.log('ERROR: Could not reload page with new information.');
+      }
+    }
+    catch (error) {
+      console.error('ERROR: Could not insert event.', error);
+    }
+  // }
+
+  // else if (user is logged in student){
+    // STUFF TO MODIFY ENTRIES BY ADDING THEMSELVES AS THE 'BOOKEE', changing booked bool to true
+  // }
 });
 
 module.exports = app.listen(3000);

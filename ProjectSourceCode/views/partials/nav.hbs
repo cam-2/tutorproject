@@ -7,7 +7,7 @@
     </form>
     <div class="nav-right">
         <a href="/discover">Discover</a>
-        <a href="/profile">Profile</a>
+        <a href="/profile/{{session.user.id}}">Profile</a>
         {{#if session}}
             <a href="/logout">Logout</a>
         {{else}}
