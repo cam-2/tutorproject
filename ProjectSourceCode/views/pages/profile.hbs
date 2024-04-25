@@ -1,19 +1,41 @@
 <div class="profileButtons">
     {{#if userTutor}}
-        <div class="post">
-            <form action="/post" method="POST" class="post-form">
-                <h4>Add a post</h4>
-                <div class="input-group">
-                    <input type="text" name="title" placeholder="Title" class="input-title">
-                    <input type="text" name="content" placeholder="Content" class="input-content">
-                </div>
-                <button type="submit" class="post-button">Post</button>
-            </form>
-        </div>
+    <center>
+        <container class = "form-container" id = "profile">
+            <div class="post">
+                <form action="/post" method="POST" class="post-form">
+                    <h4>Add a post</h4>
+                    <div class="input-group">
+                        <input type="text" name="title" placeholder="Title" class="input-title">
+                        <input type="text" name="content" placeholder="Content" class="input-content">
+                    </div>
+                    <button type="submit" class="post-button">Post</button>
+                </form>
+            </div>
+            <div>
+                <form action = "/updateProfilePhoto" enctype="multipart/form-data" method = "POST" >
+                    <center>
+                    <label for='uploaded-file"'> <b>Update Profile Photo </b></label>
+                    </center>
+                    <input type="file" class="form-control-file" name="uploaded_file">
+                    <button type = "submit" class = "btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </container>
+    </center>
     {{/if}}
     {{#if userStudent}}
         <div class="students">
-            <p>You are a student!</p>
+            <form action="/rateTutor" method="POST">
+                <label for="tutorSelect">Choose your tutor:</label>
+                <select name="tutorSelect" id="tutorSelect">
+                    {{#each tutorNames}}
+                        <option value="{{this}}">{{this}}</option>
+                    {{/each}}
+                </select>
+                <input type="number" name="rating" id="rating" min="1" max="5" placeholder="Rating">
+                <button type="submit">Submit</button>
+            </form>
         </div>
     {{/if}}
 </div>

@@ -327,6 +327,11 @@
     flex-direction: column;
 }
 
+#profile {
+    display: flex;
+    flex-direction: row;
+}
+
 .profileButtons {
     margin-top: 150px;
 }
@@ -370,6 +375,43 @@
     border: none;
     padding: 10px 20px;
     border-radius: 4px; 
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+
+#updatePhoto {
+    display:block;
+    width: 30%;
+    max-height: 200px;
+}
+
+.students {
+    background: #f0f0f0;
+    border: 2px solid #000;
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 100px auto 50px; /* Adjusted to center the form and provide spacing similar to the tutor's form */
+}
+
+.students select,
+.students input[type="number"] {
+    display: block;
+    width: calc(100% - 40px); /* Adjusting width to factor padding */
+    padding: 10px 20px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.students button {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
     cursor: pointer;
     display: block;
     width: 100%;

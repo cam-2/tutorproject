@@ -314,7 +314,7 @@ app.post('/register', async (req, res) => {
     let preemptResponse = await db.any(preemptQuery, preemptValue);
     if (preemptResponse.length != 0) {//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This student already exists; cannot register.');
-      res.redirect('pages/login', {
+      res.render('pages/login', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
@@ -352,8 +352,17 @@ app.use(auth);
 
 app.get('/profile', async (req, res) => {
   // find the user currently logged in in the db
-  const currUser = await db.one('SELECT * FROM tutors WHERE id = $1', [req.session.user.id]);
-  res.render('./pages/profile.hbs', {userStudent: userStudent, userTutor: userTutor, currUser: currUser});
+  let currUser;
+  if (userTutor) {
+    currUser = await db.one('SELECT * FROM tutors WHERE id = $1', [req.session.user.id]);
+  }
+  else {
+    currUser = await db.one('SELECT * FROM students WHERE id = $1', [req.session.user.id]); 
+  }
+  // query db for all tutor names
+  const tutors = await db.any('SELECT * FROM tutors');
+  const tutorNames = tutors.map(tutor => tutor.first_name + ' ' + tutor.last_name);
+  res.render('./pages/profile.hbs', {userStudent: userStudent, userTutor: userTutor, currUser: currUser, tutorNames: tutorNames});
 });
 
 
@@ -523,12 +532,21 @@ app.post('/registerInfoStudent', async (req, res) => {
 
 app.post('/updateProfilePhoto', upload.single('uploaded_file'), async (req,res) => {
 
-  const filename = req.file.filename;
-  const id = req.session.user.id;
-
   try {
 
-    await t.none('UPDATE tutor SET img_url = $1 WHERE id = $2', [filename, id]);
+    await db.tx(async t => {
+
+    if(req.file) {
+
+      console.log(req.file.filename);
+      console.log(req.session.user.id);
+      const id = req.session.user.id;
+      const filename = req.file.filename;
+      await t.none('UPDATE tutors SET img_url = $1 WHERE id = $2', [filename, id]);
+    }
+
+    res.redirect('/profile');
+    });
   }
 
   catch {
@@ -782,7 +800,13 @@ app.post('/addCalendarEvent', async (req, res) => {
 });
 
 app.post('/post', async (req, res) => {
-  const currUser = await db.one('SELECT * FROM tutors WHERE id = $1', [req.session.user.id]);
+  let currUser;
+  if (userTutor){
+    currUser = await db.one('SELECT * FROM tutors WHERE id = $1', [req.session.user.id]);
+  }
+  if (userStudent){
+    currUser = await db.one('SELECT * FROM students WHERE id = $1', [req.session.user.id]);
+  }
   const { title, content } = req.body;
   const tutorId = currUser.id;
   // Execute the query
@@ -797,6 +821,22 @@ app.post('/post', async (req, res) => {
   }
 
 });
+
+app.post('/rateTutor', async (req, res) => {
+  try {
+      // Extract tutor name and rating from the request body
+      const { tutorSelect, rating } = req.body;
+      const [firstName, lastName] = tutorSelect.split(' ');
+      const tutor = await db.oneOrNone('SELECT * FROM tutors WHERE first_name = $1 AND last_name = $2', [firstName, lastName]);
+      await db.none('INSERT INTO ratings (tutor_id, student_id, rating) VALUES ($1, $2, $3)', [tutor.id, req.session.user.id, rating]);
+      // console.log('Success: Rated tutor.');
+      res.redirect('/profile');
+  } catch (error) {
+      console.error('Error rating tutor:', error);
+      res.status(500).send("Failed to rate tutor.");
+  }
+});
+
 
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
