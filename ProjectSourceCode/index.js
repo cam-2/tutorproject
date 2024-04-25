@@ -523,12 +523,21 @@ app.post('/registerInfoStudent', async (req, res) => {
 
 app.post('/updateProfilePhoto', upload.single('uploaded_file'), async (req,res) => {
 
-  const filename = req.file.filename;
-  const id = req.session.user.id;
-
   try {
 
-    await t.none('UPDATE tutor SET img_url = $1 WHERE id = $2', [filename, id]);
+    await db.tx(async t => {
+
+    if(req.file) {
+
+      console.log(req.file.filename);
+      console.log(req.session.user.id);
+      const id = req.session.user.id;
+      const filename = req.file.filename;
+      await t.none('UPDATE tutors SET img_url = $1 WHERE id = $2', [filename, id]);
+    }
+
+    res.redirect('/profile');
+    });
   }
 
   catch {
