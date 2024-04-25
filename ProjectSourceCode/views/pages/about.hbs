@@ -31,8 +31,40 @@
             <h4>{{tutor.about}}</h4>
         </div>
 
-        <div class="bookButton">
-            <a href="">Book</a>
+                <div class="bookButton">
+                    <a href="">Book</a>
+                </div>
+
+            </div>
         </div>
+
+        <div class = "container" id = "tutorInfo">
+
+            <div class = "container" id = "imageContainer">
+                <div id = "tutorimg">
+                    {{#if tutor.img_url}}
+                        <img src = "../img/{{tutor.img_url}}" alt = "{{tutor.first_name}}'s profile photo.">
+                    {{else}}
+                    <h4>{{tutor.first_name}} has not uploaded a profile photo.</h4>
+                    {{/if}}
+                </div>
+            </div>
+
+        </div>
+
     </div>
+
+    <div class = "container" id = "posts">
+        <div class="posts">
+            {{#each posts}}
+                <div class="post">
+                    <h5>{{this.title}}</h5>
+                    <p>{{this.content}}</p>
+                    <p>{{this.likes}}</p>
+                </div>
+            {{/each}}
+        </div>
+    </div>    
+
+
 </body>
