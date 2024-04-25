@@ -14,6 +14,9 @@ const { Router } = require('express');
 const multer  = require('multer');
 const sharp = require('sharp');
 
+let userStudent = false; // used for checking if user is a student or tutor
+let userTutor = false;
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/img');
@@ -215,8 +218,12 @@ app.post('/login', async (req, res) => {
   try {
       let user, tableName;
       if (userType === "tutor") {
+          userTutor = true;
+          userStudent = false;
           tableName = 'tutors';
       } else {
+          userStudent = true;
+          userTutor = false;
           tableName = 'students';
       }
 
@@ -343,18 +350,12 @@ const auth = (req, res, next) => {
 
 app.use(auth);
 
-app.get('/profile/:name', (req, res) => {
-
-  try {
-    res.render('./pages/profile.hbs', {user});
-  }
-  catch {
-    // err handling 
-    console.log('Error loading profile', error);
-    res.status(500).send('Internal Server Error');
-
-  }
+app.get('/profile', async (req, res) => {
+  // find the user currently logged in in the db
+  const currUser = await db.one('SELECT * FROM tutors WHERE id = $1', [req.session.user.id]);
+  res.render('./pages/profile.hbs', {userStudent: userStudent, userTutor: userTutor, currUser: currUser});
 });
+
 
 app.get('/discover', async (req, res) => {
   try {
@@ -755,6 +756,23 @@ app.post('/addCalendarEvent', async (req, res) => {
   // else if (user is logged in student){
     // STUFF TO MODIFY ENTRIES BY ADDING THEMSELVES AS THE 'BOOKEE', changing booked bool to true
   // }
+});
+
+app.post('/post', async (req, res) => {
+  const currUser = await db.one('SELECT * FROM tutors WHERE id = $1', [req.session.user.id]);
+  const { title, content } = req.body;
+  const tutorId = currUser.id;
+  // Execute the query
+  let response = await db.any('INSERT INTO posts (title, content, fk_tutor_id) VALUES ($1, $2, $3)', [title, content, tutorId]);
+  if (response.err) {
+    console.log('Error: Could not insert into db - posts table.');
+    res.get('/profile');
+  }
+  else {
+    console.log('Success: Post added to db - posts table.');
+    res.redirect('/profile');
+  }
+
 });
 
 module.exports = app.listen(3000);
