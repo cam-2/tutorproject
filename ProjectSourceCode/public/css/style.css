@@ -327,6 +327,11 @@
     flex-direction: column;
 }
 
+#profile {
+    display: flex;
+    flex-direction: row;
+}
+
 .profileButtons {
     margin-top: 150px;
 }
@@ -373,4 +378,10 @@
     cursor: pointer;
     display: block;
     width: 100%;
+}
+
+#updatePhoto {
+    display:block;
+    width: 30%;
+    max-height: 200px;
 }
