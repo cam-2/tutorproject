@@ -19,7 +19,7 @@
                 <div class="subjects">
                     <h5>
                         {{#each subjects}}
-                        {{this.subject_name}} {{#unless @last}},{{/unless}}
+                        {{this.subject_name}}{{#unless @last}},{{/unless}}
                         {{/each}}
                     </h5>
                 </div>
@@ -32,6 +32,11 @@
                     {{/if}}
                 </div>
 
+                <div>
+                    {{#if req.session.user.id}}
+                    <a href = >Update About</a>
+                    {{/if}}
+                </div>
                 <div class="bookButton">
                     <a href="">Book</a>
                 </div>
