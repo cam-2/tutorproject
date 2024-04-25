@@ -26,7 +26,16 @@
     {{/if}}
     {{#if userStudent}}
         <div class="students">
-            <p>You are a student!</p>
+            <form action="/rateTutor" method="POST">
+                <label for="tutorSelect">Choose your tutor:</label>
+                <select name="tutorSelect" id="tutorSelect">
+                    {{#each tutorNames}}
+                        <option value="{{this}}">{{this}}</option>
+                    {{/each}}
+                </select>
+                <input type="number" name="rating" id="rating" min="1" max="5" placeholder="Rating">
+                <button type="submit">Submit</button>
+            </form>
         </div>
     {{/if}}
 </div>
