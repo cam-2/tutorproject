@@ -806,6 +806,7 @@ app.post('/rateTutor', async (req, res) => {
       const [firstName, lastName] = tutorSelect.split(' ');
       const tutor = await db.oneOrNone('SELECT * FROM tutors WHERE first_name = $1 AND last_name = $2', [firstName, lastName]);
       await db.none('INSERT INTO ratings (tutor_id, student_id, rating) VALUES ($1, $2, $3)', [tutor.id, req.session.user.id, rating]);
+      // console.log('Success: Rated tutor.');
       res.redirect('/profile');
   } catch (error) {
       console.error('Error rating tutor:', error);
