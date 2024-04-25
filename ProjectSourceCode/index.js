@@ -314,7 +314,7 @@ app.post('/register', async (req, res) => {
     let preemptResponse = await db.any(preemptQuery, preemptValue);
     if (preemptResponse.length != 0) {//if we didn't recieve an error, that means the value already exists (bad)
       console.log('Error: This student already exists; cannot register.');
-      res.redirect('pages/login', {
+      res.render('pages/login', {
         error: true,
         message: "Looks like you already have an account! Try logging in.",
       });
