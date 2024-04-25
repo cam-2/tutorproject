@@ -92,4 +92,28 @@ VALUES
 (8,7),
 (9,5),
 (9,4),
-(10, 2);
+(10, 2),
+(6,4);
+
+
+INSERT INTO posts (title, content, fk_tutor_id, post_date, likes) VALUES
+('Mastering Math Concepts', 'Join us as we explore key strategies to excel in mathematics.', 1, '2024-04-18 09:30:00',0),
+('Physics Fundamentals', 'Dive deep into the principles of physics with simple explanations.', 2, '2024-04-19 10:30:00',6),
+('Historical Insights', 'Learn about major historical events and their impact on the world.', 2, '2024-04-20 11:30:00',3),
+('Writing Essentials', 'Improve your writing skills with tips from an English expert.', 3, '2024-04-21 12:00:00',87),
+('Philosophical Thoughts', 'Explore philosophical theories that shaped the modern world.', 4, '2024-04-22 13:00:00',12),
+('Chemical Reactions Unfolded', 'Understand the magic of chemistry through exciting experiments.', 5, '2024-04-23 14:00:00',1),
+('Biology Breakthroughs', 'Delve into the latest discoveries in the field of biology.', 5, '2024-04-24 15:00:00',0),
+('Calculus Challenges', 'Solve complex calculus problems with ease and confidence.', 6, '2024-04-25 16:00:00',13),
+('The Probability Pit', 'Navigate the intriguing world of probability and statistics.', 7, '2024-04-26 17:00:00',2),
+('Literature and Life', 'Discover how classic literature influences our lives today.', 8, '2024-04-27 18:00:00',0),
+('Physics in Everyday Life', 'See how physics applies to daily phenomena and gadgets.', 9, '2024-04-28 19:00:00',0),
+('Mathematical Puzzles', 'Challenge yourself with mind-bending mathematical puzzles.', 10, '2024-04-29 20:00:00',3),
+('The Art of Debate', 'Learn effective debate techniques and improve your argumentation skills.', 1, '2024-04-30 21:00:00',66),
+('Science Behind Cooking', 'Explore the chemistry that makes your favorite dishes delicious.', 2, '2024-05-01 09:00:00',6),
+('Understanding Genetics', 'Unravel the complexities of genetics in modern biology.', 3, '2024-05-02 10:00:00',132),
+('Exploring Space', 'Journey through the universe and learn about space exploration.', 4, '2024-05-03 11:00:00',0),
+('The Digital Age', 'Discuss the impacts of digital technology on society and our future.', 5, '2024-05-04 12:00:00',23),
+('Mind and Meditation', 'Explore the benefits of meditation on mental health and focus.', 6, '2024-05-05 13:00:00',16),
+('The Future of AI', 'Dive into the advancements and ethical considerations of artificial intelligence.', 7, '2024-05-06 14:00:00',0),
+('Global Warming Facts', 'Understand the science behind global warming and climate change.', 8, '2024-05-07 15:00:00',28);
