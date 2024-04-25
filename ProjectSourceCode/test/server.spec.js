@@ -66,15 +66,14 @@ describe('Testing Register API', () => {
 });
 
 describe('Testing Login API', () => {
-    it('positive : /login. Valid credentials', done => {
+    it('positive : /loginTutor. Valid credentials', done => {
         chai
             .request(server)
-            .post('/login')
+            .post('/loginTutor')
             .redirects(0)
             .send({
                 username: 'johndoe',
-                password: 'password123',
-                tutor_student_rad: 'tutor'
+                password: 'password123'
             })
             .end((err, res) => {
                 res.should.have.status(302);
@@ -85,15 +84,14 @@ describe('Testing Login API', () => {
 });
 
 describe('Testing Login API', () => {
-    it('negative : /login. Invalid username', done => {
+    it('negative : /loginTutor. Invalid username', done => {
         chai
             .request(server)
-            .post('/login')
+            .post('/loginTutor')
             .redirects(0)
             .send({
                 username: 'invalid',
-                password: 'password123',
-                tutor_student_rad: 'tutor'
+                password: 'password123'
             })
             .end((err, res) => {
                 res.should.have.status(200);
@@ -102,3 +100,21 @@ describe('Testing Login API', () => {
             });
     });
 });
+
+// describe('Removing Test Cases from DB', () => {
+//     it('Removing test cases...', done => {
+//         chai
+//             .request(server)
+//             .post('/removeTests')
+//             .redirects(0)
+//             .send({
+//             //     username: 'invalid',
+//             //     password: 'password123'
+//             })
+//             .end((err, res) => {
+//                 res.should.have.status(302);
+//                 res.text.should.include('Successfully removed.');
+//                 done();
+//             });
+//     });
+// });
