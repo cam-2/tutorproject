@@ -4,9 +4,13 @@
         {{#each tutors}}
         <div class="carousel-item {{#if @first}}active{{/if}}">
             <div class="card">
+                {{#if img_url}}
+                <img src = "../img/{{img_url}}" alt = "{{firstName}}'s profile photo." style = "width: 450px">
+                {{else}}
                 <img class="card-img-top"
                     src="https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png"
-                    alt="{{firstName}} {{lastName}}'s picture">
+                    alt="empty profile picture">
+                {{/if}}
                 <div class="card-body">
                     <h3 class="card-title">{{firstName}} {{lastName}}</h3>
                     <p class="card-text">{{#each subjects}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>
