@@ -5,7 +5,7 @@
         <div class="carousel-item {{#if @first}}active{{/if}}">
             <div class="card">
                 {{#if img_url}}
-                <img src = "../img/{{img_url}}" alt = "{{firstName}}'s profile photo." style = "width: 450px">
+                <img src = "../img/{{img_url}}" alt = "{{firstName}}'s profile photo.">
                 {{else}}
                 <img class="card-img-top"
                     src="https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png"
@@ -63,6 +63,11 @@
         border: none;
         box-shadow: 2px 6px 8px 0 rgba(20, 20, 24, 0.2);
         font-family: Arial, Helvetica, sans-serif
+    }
+
+    .card img {
+        width: 480px;
+        height: 360px;
     }
 
     .btn {

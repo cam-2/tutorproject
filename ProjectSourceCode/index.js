@@ -413,6 +413,7 @@ app.post("/search", async (req, res) => {
       const tutorData = tutors.map(tutor => ({
         id: tutor.id,
         username: tutor.username,
+        img_url: tutor.img_url,
         firstName: tutor.first_name,
         lastName: tutor.last_name,
         averageRating: tutor.average_rating,
