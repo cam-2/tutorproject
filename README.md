@@ -41,4 +41,5 @@ The deployment is on localhost via Docker. In order to access Twuttor first down
 TBD
 
 ## Current Deployment
-<insert [github repo link here](https://github.com/cam-2/tutorproject)>
+https://github.com/cam-2/tutorproject
+
