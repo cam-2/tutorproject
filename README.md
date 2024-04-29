@@ -34,10 +34,11 @@ Once a student finds a tutor, the application provides the tutor’s email addre
 - Web browser w/ internet connection
 
 ## Local Run Instructions
-TBD
+The deployment is on localhost via Docker. In order to access Twuttor first download the project source code from the Github page of https://github.com/cam-2/tutorproject. Following that navigate to the ProjectSourceCode directory of the project and start up docker by running: docker compose up -d. Following that the user may need to wait a bit depending on their device and especially if it is their first time for NodeJs to initialize everything. Once the Docker finishes setting up everything, navigate to the url of: http://localhost:3000/. From there, the application will be able to guide the user through everything else.
+
 
 ## Running Tests
 TBD
 
 ## Current Deployment
-<insert github repo link here>
+<insert [github repo link here](https://github.com/cam-2/tutorproject)>
