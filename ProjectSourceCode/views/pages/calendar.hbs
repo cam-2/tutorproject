@@ -58,7 +58,16 @@
     </div>
   </center>
 
-  <div class="container">
+
+  <div>
+    <form action="/getWeek" method="POST">
+      Find a Week:<input type="date" id="find_week" name="cal_week">
+      <button type="submit" class="btn btn-primary">Go</button>
+    </form>
+  </div>
+
+
+  <div class="unknown">
     <div id="event-modal">
       <div id="calendar" class="row">
         <!-- CHANGE FUNC CALL TO getDayCol(day):
@@ -67,14 +76,22 @@
                 WEEKS THAN JUST THIS WEEK
         -->
         {{#each synthedData}}
-          <div class="col-4 card container">
+          <div class="col-1 card container">
             <h2>{{dayName}} ({{date}})</h2>
             {{#if events.length}}
               {{#each events}}
-                <div class="event-box">
-                  <p>Event ID: {{id}}, Subject: {{subject}}, Start Time: {{start_time}}</p>
-                  <!-- Add more event details as needed -->
-                </div>
+                <eb1>
+                  <div class="col-4 day-card">
+                    <div class="event-box">
+                      <p>
+                        Subject: {{subject}}<br>
+                        Start Time: {{start_time}}<br>
+                        Hosting Tutor: {{tutor_name}}
+                      </p>
+                      <!-- Add more event details as needed -->
+                    </div>
+                  </div>
+                </eb1>
                 <div>
                   <!-- EDIT AN APPOINTMENT LOGIC GOES HERE (BOOK IT, CHANGE FIELDS IF PROPER TUTOR, ETC.) 
                        THIS WILL BE A BUTTON TO OPEN THE MODAL FORM.
@@ -123,21 +140,21 @@
 <style>
 /* Custom CSS */
 .day-column {
-  /* Adjust width and height of the day column */
-  width: 10%; /* Adjust as needed */
-  min-height: 200px; /* Adjust as needed */
-}
-
-.card-container {
-  /* Ensure all cards align in a row */
-  display: flex;
+  width: 100%; /* Adjust the width as needed */
+  min-height: 600px; /* Adjust the minimum height as needed */
+  display: inline;
+  flex-direction: row;
   flex-wrap: nowrap;
 }
-
 .day-card {
-  /* Adjust card styles */
-  width: calc(90% / 7); /* Adjust card width based on number of days */
-  margin: 5px; /* Adjust margin as needed */
+  width: calc(100%); /* Adjust card width based on number of days */
+  margin-bottom: 10px; /* Add margin between cards */
+  display: inline;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+.eb1{
+  background-color: lightgrey;
 }
 </style>
 

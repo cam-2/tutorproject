@@ -559,12 +559,13 @@ app.post('/updateProfilePhoto', upload.single('uploaded_file'), async (req,res) 
 
 function getDayCol(day){
   // Get the current date
-    const currentDate = day;
+    const currentDate = new Date(day);
+    console.log('getDayCol(): currentDate: ', currentDate);
     // Calculate the start of the week (Sunday)
-    const startOfWeek = new Date(currentDate);
+    var startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() );
     // Calculate the end of the week (Saturday)
-    const endOfWeek = new Date(currentDate);
+    var endOfWeek = new Date(currentDate);
     endOfWeek.setDate(currentDate.getDate() + (6 - currentDate.getDay()));
 
     //determine all the days in between
@@ -627,6 +628,19 @@ function getTodayWeekStartFormed(){
   return formattedStartOfWeek;
 }
 
+function getWeekStartFormed(date){
+  const currentDate = date;
+  // Calculate the start of the week (Sunday)
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() );
+  // Format dates as YYYY-MM-DD for SQL queries
+  const formattedStartOfWeek = startOfWeek.toISOString().slice(0, 10);
+
+  // console.log("Start of the week:", formattedStartOfWeek);
+
+  return formattedStartOfWeek;
+}
+
 function getTodayWeekEndFormed(){
   const currentDate = new Date();
   // Calculate the end of the week (Saturday)
@@ -640,10 +654,33 @@ function getTodayWeekEndFormed(){
   return formattedEndOfWeek;
 };
 
+function getWeekEndFormed(date){
+  const currentDate = new Date(date);
+  // Calculate the end of the week (Saturday)
+  const endOfWeek = new Date(currentDate);
+  endOfWeek.setDate(currentDate.getDate() + (6 - currentDate.getDay()));
+  // Format dates as YYYY-MM-DD for SQL queries
+  const formattedEndOfWeek = endOfWeek.toISOString().slice(0, 10);
+
+  // console.log("End of the week:", formattedEndOfWeek);
+
+  return formattedEndOfWeek;
+};
+
+async function getTutorName(tutorId) {
+  try {
+      const tutor = await db.one('SELECT name FROM tutors WHERE id = $1', tutorId);
+      return tutor.name;
+  } catch (error) {
+      console.error('Error fetching tutor name:', error);
+      return null; // or handle the error as needed
+  }
+}
+
 function synthesizeEvData (daysData, eventsOfTheWeek) {
-  //debug
-  // console.log('=========:DAYSDATA:=========',daysData,'=========END=========');
-  // console.log('=========:EVENTSOFWEEK:=========',eventsOfTheWeek,'=========END=========');
+  // //debug
+  console.log('=========:DAYSDATA:=========',daysData,'=========END=========');
+  console.log('=========:EVENTSOFWEEK:=========',eventsOfTheWeek,'=========END=========');
 
   const finalProduct = daysData.days.map(day => ({
     dayName: day.dayName,
@@ -656,12 +693,13 @@ function synthesizeEvData (daysData, eventsOfTheWeek) {
 
   //debug
     console.log('=========FINALPROD=========');
-    finalProduct.forEach(day => {
-      console.log(`${day.dayName} (${day.date}):`);
-      day.events.forEach(event => {
-        console.log(`Event ID: ${event.id}, Subject: ${event.subject}, Start Time: ${event.start_time}`);
-      });
-    });
+    console.log(finalProduct);
+    // finalProduct.forEach(day => {
+    //   console.log(`${day.dayName} (${day.date}):`);
+    //   day.events.forEach(event => {
+    //     console.log(`Event ID: ${event.id}, Subject: ${event.subject}, Start Time: ${event.start_time}`);
+    //   });
+    // });
     console.log('===========END===========');
   //end debug
 
@@ -684,8 +722,8 @@ app.get('/calendar', async (req, res) => {
 
   try {
     let weeksEvents = await db.any(returnQuery, bookends);
-    // console.log('-----------:DATA:-----------');
-    // console.log(weeksEvents);
+    console.log('-----------:DATA:-----------');
+    console.log(weeksEvents);
     ////////////////////////////////
     ////////////////////////////////
     /////CHANGE TO getDayCol()//////
@@ -699,6 +737,48 @@ app.get('/calendar', async (req, res) => {
     console.log('ERROR: Could not load calendar.');
     res.render('pages/calendar', {message:'An error occurred while fetching this week\'s events.', error:true});
   }
+});
+
+app.post('/getWeek', async (req,res) => {
+  const returnQuery = 'SELECT * FROM availabilities WHERE start_time >= $1 AND end_time <= $2';
+
+  if(req.body.cal_week != ""){
+    console.log("GIVEN DATE: ", req.body.cal_week);
+    const givenDay = new Date(req.body.cal_week);
+
+    const formattedStartOfWeek = getWeekStartFormed(givenDay);
+    const formattedEndOfWeek = getWeekEndFormed(givenDay);
+    const bookends = [
+      formattedStartOfWeek,
+      formattedEndOfWeek
+    ];
+    console.log("bookends: ", bookends);
+
+    // const testQ = 'SELECT * FROM availabilities';
+    // try{
+    //   let weeksEvents = await db.any(testQ);
+    //   console.log('Test result: ', weeksEvents);
+    // }
+    // catch(error){console.error(error);}
+
+    console.log("Searching for events between the given bookends...");
+    try {
+      let weeksEvents = await db.any(returnQuery, bookends);
+      var synthedData = synthesizeEvData(getDayCol(formattedStartOfWeek), weeksEvents);
+      console.log('-----------:DATA:-----------');
+      console.log(weeksEvents);
+      console.log('Success: Reloading page with new event.');
+      res.render('pages/calendar', {synthedData});
+    }
+    catch (error) {
+      console.log('ERROR: Could not reload page with new information.', error);
+      res.render('pages/calendar', {message:'An error occured while fetching dates.', error:true});
+    }
+  }
+  else{
+    console.log('ERROR: Can not get empty date.');
+    res.get('pages/discover', {message:'You must enter a valid date.', error:true});
+  }  
 });
 
 app.post('/addCalendarEvent', async (req, res) => {
@@ -730,13 +810,23 @@ app.post('/addCalendarEvent', async (req, res) => {
   
 
   // if(this user is a tutor){
-    const addAvailQuery = 'INSERT INTO availabilities (subject, start_time, end_time, fk_tutor_id) VALUES ($1,$2,$3,$4)';
+    const tutorNameQuery = 'SELECT * FROM tutors WHERE id = $1 LIMIT 1';
+    var tutorData;
+    var tutorName;
+    try{
+      let tutorData = await db.one(tutorNameQuery, response.id);
+      tutorName = tutorData.first_name + " " + tutorData.last_name;
+    }catch(error){console.log(error);}
+
+ 
+    const addAvailQuery = 'INSERT INTO availabilities (subject, start_time, end_time, tutor_name, fk_tutor_id) VALUES ($1,$2,$3,$4,$5)';
     // const availVals = ['CHEM', '2024-04-18 13:30:00 -6:00', '2024-04-18 14:30:00 -6:00', 1];
     const reqFields = [
       req.body.evnt_subj,
       req.body.evnt_stime,
       req.body.evnt_etime,
-      response.id //This should be the tutor's id in the database
+      tutorName,
+      response.id, //This should be the tutor's id in the database
     ];
     console.log("ReqF:");
     console.log(reqFields);
@@ -756,7 +846,7 @@ app.post('/addCalendarEvent', async (req, res) => {
       formattedStartOfWeek,
       formattedEndOfWeek
     ];
-    console.log("???");
+    console.log("Bookends: ", bookends);
 
     //Run queries
     try {

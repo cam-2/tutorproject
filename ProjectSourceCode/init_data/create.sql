@@ -65,6 +65,7 @@ CREATE TABLE availabilities (
     description VARCHAR(500),
     start_time TIMESTAMP,
     end_time TIMESTAMP,
+    tutor_name VARCHAR (50),
     fk_tutor_id INT REFERENCES tutors(id) NOT NULL, -- the tutor hosting the appointment
     fk_student_id INT REFERENCES students(id), -- the student who booked the appointment, can be NULL
     booked_bool BOOLEAN -- NULL or FALSE means it hasn't been booked yet, TRUE means the appointment has been reserved
