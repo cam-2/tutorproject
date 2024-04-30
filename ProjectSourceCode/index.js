@@ -48,7 +48,7 @@ exports.resizeUserPhoto = async (req, res, next) => {
 
   req.file.filename = `user-${req.session.user.id}-${Date.now()}.jpeg`;
 
-  await sharp(req.file.buffer)
+  await sharp(req.file)
     .resize(500, 500)
     .toFormat('jpeg')
     .toFile(`public/img/${req.file.filename}`);
@@ -472,12 +472,14 @@ app.post('/registerInfoTutor', upload.single('uploaded_file'), async (req, res) 
 
       await db.tx(async t => {
 
+          // Update tutors table if photo uploaded
           if(req.file) {
 
-            // Update tutors table if photo uploaded
             const filename = req.file.filename;
+            
             await t.none('UPDATE tutors SET first_name = $1, last_name = $2, email = $3, img_url = $4 WHERE id = $5', [first_name, last_name, email, filename, tutorId]);
             console.log('Success: User modified - tutors table.');
+
           }
 
           else {
