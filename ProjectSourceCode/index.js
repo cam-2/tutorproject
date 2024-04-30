@@ -380,6 +380,7 @@ app.get('/discover', async (req, res) => {
 
     const tutorData = tutors.map(tutor => ({
       id: tutor.id,
+      img_url: tutor.img_url,
       username: tutor.username,
       firstName: tutor.first_name,
       lastName: tutor.last_name,
