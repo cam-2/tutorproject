@@ -265,6 +265,144 @@
     margin-bottom: 10px;
 }
 
+.students {
+    background: #f0f0f0;
+    border: 2px solid #000;
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 100px auto 50px; /* Adjusted to center the form and provide spacing similar to the tutor's form */
+}
+
+.students select,
+.students input[type="number"] {
+    display: block;
+    width: calc(100% - 40px); /* Adjusting width to factor padding */
+    padding: 10px 20px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.students button {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+
+.button-rating-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.carousel-inner {
+    padding: 1em;
+}
+
+.card {
+    margin: 0 0.5em;
+    border: none;
+    box-shadow: 2px 6px 8px 0 rgba(20, 20, 24, 0.2);
+    font-family: Arial, Helvetica, sans-serif
+}
+
+.btn {
+    color: white;
+    width: 150px;
+    border-radius: 15px;
+    border: 2px solid black;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-top: 10px;
+    text-decoration: none;
+    background-color: black;
+    font-size: large;
+}
+
+.btn:hover {
+    background-color: black;
+    border: 2px solid black;
+    opacity: 80%;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    background-color: #000000;
+    width: 6vh;
+    height: 6vh;
+    border-radius: 100%;
+    top: 50%;
+    transform: translateY(-100%);
+    margin-right: 2%;
+    margin-left: 2%;
+}
+
+.carousel-item {
+    margin-right: 0;
+    flex: 0 0 25%;
+    display: block;
+}
+
+.carousel-inner {
+    display: flex;
+}
+
+.profileButtons {
+    margin-top: 150px;
+}
+
+.post-form {
+    background: #f0f0f0; 
+    border: 2px solid #000; 
+    border-radius: 16px; 
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+}
+
+.input-group {
+    background: #fff; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    border: 1px solid #ccc; 
+    margin-bottom: 15px;
+}
+
+.input-title,
+.input-content {
+    border: none;
+    padding: 10px 15px;
+    display: block;
+    width: calc(100% - 30px);
+}
+
+.input-title {
+    border-bottom: 1px solid #ccc;
+}
+
+.input-content {
+    min-height: 150px;
+}
+
+.post-button {
+    background: #000; 
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px; 
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+
+
 #landing {
 
     margin-left: 20px;
@@ -333,87 +471,12 @@
     flex-direction: row;
 }
 
-.profileButtons {
-    margin-top: 150px;
-}
-
-.post-form {
-    background: #f0f0f0; 
-    border: 2px solid #000; 
-    border-radius: 16px; 
-    padding: 20px;
-    max-width: 500px;
-    margin: auto;
-}
-
-.input-group {
-    background: #fff; 
-    border-radius: 8px; 
-    overflow: hidden; 
-    border: 1px solid #ccc; 
-    margin-bottom: 15px;
-}
-
-.input-title,
-.input-content {
-    border: none;
-    padding: 10px 15px;
-    display: block;
-    width: calc(100% - 30px);
-}
-
-.input-title {
-    border-bottom: 1px solid #ccc;
-}
-
-.input-content {
-    min-height: 150px;
-}
-
-.post-button {
-    background: #000; 
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px; 
-    cursor: pointer;
-    display: block;
-    width: 100%;
-}
-
 #updatePhoto {
     display:block;
     width: 30%;
     max-height: 200px;
 }
 
-.students {
-    background: #f0f0f0;
-    border: 2px solid #000;
-    border-radius: 16px;
-    padding: 20px;
-    max-width: 500px;
-    margin: 100px auto 50px; /* Adjusted to center the form and provide spacing similar to the tutor's form */
-}
-
-.students select,
-.students input[type="number"] {
-    display: block;
-    width: calc(100% - 40px); /* Adjusting width to factor padding */
-    padding: 10px 20px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: #fff;
-}
-
-.students button {
-    background: #000;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: block;
-    width: 100%;
+#carouselExampleControls {
+    margin-top: 6em;
 }
